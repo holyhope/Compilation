@@ -3,39 +3,44 @@
   #include <stdio.h>
   #include <string.h>
   #include <unistd.h>
-  int yyerror(char*);
+  int yyerror( char* );
   int yylex();
-   FILE* yyin;
-   int jump_label=0;
-   void inst(const char *);
-   void instarg(const char *,int);
-   void comment(const char *);
+
+  FILE* yyin;
+  int jump_label = 0;
+  void inst( const char * );
+  void instarg( const char *, int );
+  void comment( const char * );
 %}
 
 %union {
   void*                                       adr;
   unsigned int                                num;
   char*                                       ident;
-  enum { gte, gt, lt, lte, eq, neq }          comparator;
+  enum { gte, gt, lt, lte, eq, neq  }         comparator;
   enum { add, sub, time, divi, modu }         operator;
   enum { vrg, pv }                            separator;
   enum { lpar, rpar, lacc, racc, lsqb, rsqb } block;
 }
 
-%left "<" ">" "<=" "=>" "==" "!=" /* Comparateurs */
-%left "+" "-"                     /* additions / soustractions */
-%left "*" "/"                     /* multiplications / divisions */
-%left UMINUS                      /* Moins unaire */
-%right PTR ADR                    /* Pointeur */
+%left "<" ">" "<=" "=>" "==" "!="  /* Comparateurs                */
+%left "+" "-"                      /* additions / soustractions   */
+%left "*" "/"                      /* multiplications / divisions */
+%left UMINUS                       /* Moins unaire                */
+%right PTR ADR                     /* Pointeur                    */
 
-%token <comp>   COMP
-%token <addsub> ADDSUB
-%token <div>    DIV
-%token <star>   STAR
-%token <num>    NUM
-%token <ident>  IDENT
-%token <mod>    MOD
-%token <adr>    ADR
+%token <comp>        COMP
+%token <operator>    DIV ADDSUB STAR OPERATOR
+%token <num>         NUM
+%token <ident>       IDENT
+%token <ident>       ADR
+
+%token IF ELSE MAIN WHILE VRG PV EGAL PRINT READ
+%token LPAR RPAR LACC RACC LSQB RSQB
+%token VOID ENTIER POINTEUR
+
+%nonassoc LOWER_THAN_ELSE
+%nonassoc ELSE
 
 %%
 prog: DeclConst DeclVar DeclFonct DeclMain
@@ -49,13 +54,12 @@ ListConst: ListConst VRG IDENT EGAL NombreSigne
 NombreSigne: NUM
   | ADDSUB NUM
   ;
-DeclVar: DeclVar VAR ListVar PV
+DeclVar: DeclVar VAR ListVar PV                                         
   |
   ;
 ListVar: ListVar VRG Variable
   | Variable
 Variable: STAR Variable
-  | IDENT LSQB ENTIER RSQB
   | IDENT
   ;
 DeclMain: EnTeteMain Corps
@@ -63,7 +67,7 @@ DeclMain: EnTeteMain Corps
 EnTeteMain: MAIN LPAR RPAR
   ;
 DeclFonct: DeclFonct DeclUneFonct
-  |
+  | 
   ;
 DeclUneFonct: EnTeteFonct Corps
   ;
@@ -87,7 +91,7 @@ Instr: IDENT EGAL Exp PV
   | STAR IDENT EGAL Exp PV
   | IDENT EGAL MALLOC LPAR Exp RPAR PV
   | FREE LPAR Exp RPAR PV
-  | IF LPAR Exp RPAR Instr
+  | IF LPAR Exp RPAR Instr %prec LOWER_THAN_ELSE
   | IF LPAR Exp RPAR Instr ELSE Instr
   | WHILE LPAR Exp RPAR Instr
   | RETURN Exp PV
@@ -117,44 +121,15 @@ Exp: Exp ADDSUB Exp
   ;
 
 
-PV: ";" ;
-CONST: "const" ;
-RETURN: "return" ;
-
-FREE: "free" ;
-MALLOC: "malloc" ;
-
-VRG: "," ;
-LPAR: "(" ;
-RPAR: ")" ;
-LACC: "{" ;
-RACC: "}" ;
-LSQB: "[" ;
-RSQB: "]" ;
-
-VOID: "void" ;
-ENTIER: "entier" ;
-POINTEUR: "pointeur" ;
-
-IF: "if" ;
-ELSE: "else" ;
-WHILE: "while" ;
-EGAL: "=" ;
 VAR: ENTIER
   | POINTEUR
   ;
-MAIN: "main" ;
-
-READ: "read" ;
-PRINT: "print" ;
 %%
 
 int yyerror(char* s) {
   fprintf(stderr,"%s\n",s);
   return 0;
 }
-
-
 
 void endProgram() {
   printf("HALT\n");
