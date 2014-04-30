@@ -19,38 +19,37 @@
 ">="            { yylval.comparator = gte; return COMP; }
 "!="            { yylval.comparator = neq; return COMP; }
 
-"+"             { yylval.comparator = add;  return ADDSUB;   }
-"-"             { yylval.comparator = sub;  return ADDSUB;   }
+"+"             { yylval.operator = add;  return ADDSUB;   }
+"-"             { yylval.operator = sub;  return ADDSUB;   }
 
-"*"             { yylval.comparator = time; return OPERATOR; }
-"/"             { yylval.comparator = divi; return OPERATOR; }
-"%"             { yylval.comparator = modu; return OPERATOR; }
-
-";"             { return PV;     }
+"*"             { return STAR; }
+"/"             { return DIV; }
+"%"             { return MOD; }
 
 [0-9]+                      { yylval.num   = atoi( yytext ); return NUM; }
 \*[a-zA-Z][a-zA-Z0-9_]+     { yylval.ident = yytext + 1;     return ADR; }
 
-"("        {return LPAR;     }
-")"        {return RPAR;     }
-"{"        {return LACC;     }
-"}"        {return RACC;     }
-"["        {return LSQB;     }
-"]"        {return RSQB;     }
-","        {return VRG;      }
-"if"       {return IF;       }
-"else"     {return ELSE;     }
-"main"     {return MAIN;     }
-"void"     {return VOID;     }
-"read"     {return READ;     }
-"free"     {return FREE;     }
-"const"    {return CONST;    }
-"print"    {return PRINT;    }
-"while"    {return WHILE;    }
-"entier"   {return ENTIER;   }
-"malloc"   {return MALLOC;   }
-"return"   {return RETURN;   }
-"pointeur" {return POINTEUR; }
+"("             { return LPAR;     }
+")"             { return RPAR;     }
+"{"             { return LACC;     }
+"}"             { return RACC;     }
+"["             { return LSQB;     }
+"]"             { return RSQB;     }
+";"             { return PV;       }
+","             { return VRG;      }
+"if"            { return IF;       }
+"else"          { return ELSE;     }
+"main"          { return MAIN;     }
+"void"          { return VOID;     }
+"read"          { return READ;     }
+"free"          { return FREE;     }
+"const"         { return CONST;    }
+"print"         { return PRINT;    }
+"while"         { return WHILE;    }
+"entier"        { return ENTIER;   }
+"malloc"        { return MALLOC;   }
+"return"        { return RETURN;   }
+"pointeur"      { return POINTEUR; }
 
 [a-zA-Z][a-zA-Z0-9_]*      { yylval.ident = yytext;   return IDENT;  }
 
