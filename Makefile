@@ -1,6 +1,6 @@
 CC=gcc
-CFLAGS=-Wall
-LDFLAGS=#-lfl
+CFLAGS=-Wall `pkg-config --cflags glib-2.0`
+LDFLAGS=`pkg-config --libs glib-2.0` #-lfl
 OUT_EXEC=super_compilator
 EXEC=gcc
 

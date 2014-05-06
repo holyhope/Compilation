@@ -3,25 +3,37 @@
   #include <stdio.h>
   #include <string.h>
   #include <unistd.h>
+  #include <glib.h>
+
+  typedef struct {
+    const char *name;
+    int addr;
+  } Variable;
+
   int yyerror( char* );
   int yylex();
 
   FILE* yyin;
   int jump_label = 0;
+  int jump_global = 0;
   void inst( const char * );
   void instarg( const char *, int );
   void comment( const char * );
 
-  void create_variable( const char *name, int value ) {
-    
-  }
+  GList *list_variables;
+
+  int create_variable( const char *name, int size );
+  int get_addr( const char *name );
+
+  void inst( const char *s );
+  void instarg( const char *s, int n );
 %}
 
 %union {
   void*                                       adr;
   unsigned int                                num;
   char*                                       ident;
-  enum { gte, gt, lt, lte, eq, neq  }         comparator;
+  enum { gte, gt, lt, lte, eq, neq }          comparator;
   enum { add, sub }                           operator;
 }
 
@@ -29,7 +41,7 @@
 %left "+" "-"                      /* additions / soustractions   */
 %left "*" "/"                      /* multiplications / divisions */
 %left UMINUS                       /* Moins unaire                */
-%right PTR ADR                     /* Pointeur                    */
+%right ADR /* Pointeur */ ADDSUB_UNAIRE
 
 %token <comparator>  COMP
 %token <operator>    ADDSUB
@@ -59,28 +71,40 @@ ListConst: ListConst VRG IDENT EGAL NombreSigne
   | IDENT EGAL NombreSigne
   ;
 NombreSigne: NUM                                         { $$ =  $1; }
-  | ADDSUB NUM                                           { $$ = -$2; }
+  | ADDSUB NUM %prec ADDSUB_UNAIRE                       { if ( $1 == sub ) $$ = -$2; else $$ = $2; }
   ;
-DeclVar: DeclVar VAR ListVar PV
+DeclVar: DeclVar VAR ListVar PV                          {  }
   | /* epsi */
   ;
 ListVar: ListVar VRG Variable                            {}
   | Variable                                             {}
   ;
-Variable: STAR Variable                                  { /* TODO: pointeur */ }
-  | IDENT LSQB ENTIER RSQB                               { /* TODO: tableau taille $3 */ }
-  | IDENT                                                { /* TODO: créer variable $1 */ }
+Variable: STAR Variable                                  {}
+  | IDENT                                                {
+    int addr;
+    if ( -1 == ( addr = get_addr( $1 ) ) ) {
+      if ( -1 == ( addr = create_variable( $1, 1 ) ) ) {
+        exit( EXIT_FAILURE );
+      }
+    }
+    instarg( "SET", addr );
+    inst( "SWAP" );
+    instarg( "SET", 0 );
+    inst( "SAVER" );
+    instarg( "LABEL", 0 );
+    return addr;
+  }
   ;
 DeclMain: EnTeteMain Corps                               {}
   ;
 EnTeteMain: MAIN LPAR RPAR                               { instarg( "LABEL", 0 ); }
   ;
-DeclFonct: DeclFonct                                     {}
+DeclFonct: DeclFonct DeclUneFonct                        {}
   | /* epsi */
   ;
-DeclUneFonct: EnTeteFonct Corps ENDFUNCTION              { instr( "JUMP", $3 );                    }
+DeclUneFonct: EnTeteFonct Corps ENDFUNCTION              { instarg( "JUMP", $3 );                    }
   ;
-ENDFUNCTION:                                             { instrarg( "LABEL", $$ = jump_label++ ); }
+ENDFUNCTION:                                             { instarg( "LABEL", $$ = jump_label++ ); }
 ;
 EnTeteFonct: Type IDENT LPAR Parametres RPAR             { instarg( "LABEL", jump_label++ );       }
   ;
@@ -128,29 +152,35 @@ Exp: Exp ADDSUB Exp { instarg("SET", $3);
           inst("SUB");
     inst("PUSH"); 
   }
-  | Exp STAR Exp                                         { instarg("SET", $3 ); inst("SWAP"); instarg( "SET", $1 ); inst("MULT"); inst("PUSH"); }
+  | Exp STAR Exp                                         {
+    instarg("SET", $3 );
+    inst("SWAP");
+    instarg( "SET", $1 );
+    inst("MULT");
+    inst("PUSH");
+  }
   | Exp DIV Exp                                          { instarg("SET", $3 ); inst("SWAP"); instarg( "SET", $1 ); inst("DIV"); inst("PUSH"); }
-  | Exp MOD Exp  { instarg("SET", $3); inst("SWAP"); instarg("SET", $1); inst("MOD"); inst("PUSH"); }
+  | Exp MOD Exp                                          { instarg("SET", $3);  inst("SWAP"); instarg("SET", $1);   inst("MOD"); inst("PUSH"); }
   | Exp COMP Exp {
                   instarg("SET", $3); 
                   inst("SWAP"); 
                   instarg("SET", $1);
                   switch( $2 ) {
-                    case eq: inst("EQUAL"); break;
-                    case neq:inst("NOTEQ"); break;
-                    case lt: inst("LOW");   break;
-                    case gt: inst("GREAT"); break;
-                    case lte: inst("LEQ");  break;
-                    case gte: inst("GEQ");  break;
+                    case lt:  inst("LOW");   break;
+                    case gt:  inst("GREAT"); break;
+                    case eq:  inst("EQUAL"); break;
+                    case lte: inst("LEQ");   break;
+                    case gte: inst("GEQ");   break;
+                    case neq: inst("NOTEQ"); break;
                     default: inst("UNDEFINED COMPARATOR");
                   }
   inst("WRITE");
   }
-  | ADDSUB Exp                                           { if($1==sub) $$=($2); else $$=$2; } /* TODO ######### */
+  | ADDSUB Exp %prec ADDSUB_UNAIRE                       { if ( $1 == sub ) $$ = -$2; else $$ = $2; }
   | LPAR Exp RPAR                                        { $$ = $2; }
-  | Variable                                             { }
-  /*| ADR Variable ################ */
-  | NUM { instarg("SET",$$=$1); }
+  | Variable                                             {}
+  | ADR Variable                                         {}
+  | NUM                                                  { instarg( "SET", $$ = $1 ); }
   | IDENT LPAR Arguments RPAR                            {  }
   ;
 
@@ -159,7 +189,7 @@ VAR: ENTIER
   ;
 
 FIXIF:                                                   { instarg( "JUMPF", $$ = jump_label += 2 ); } ;
-FIXELSE:                                                 { instarg( "JUMP",  $$ = jump_label      ); instarg( "LABEL", jump_label - 1 ); } ;
+FIXELSE:                                                 { instarg( "JUMP",  $$ = jump_label++    ); instarg( "LABEL", $$=$<num>-2 ); } ;
 WHILESTART:                                              { instarg( "LABEL", $$ = jump_label++    ); } ;
 WHILETEST:                                               { instarg( "JUMPF", $$ = jump_label++    ); } ;
 
@@ -182,6 +212,33 @@ void instarg( const char *s, int n ) {
   printf( "%s\t%d\n", s, n );
 }
 
+gint compare_data( gconstpointer data1, gconstpointer data2 ) {
+  return strcmp( (char*)((Variable*)data1)->name, (char*)((Variable*)data2)->name );
+}
+
+int create_variable( const char *name, int size ) {
+  Variable * data = (Variable*) malloc( sizeof(Variable) );
+  if ( data == NULL ) {
+    exit( EXIT_FAILURE );
+  }
+  data->name = name;
+  data->addr = jump_global += size;
+  list_variables = g_list_insert_sorted( list_variables, (gpointer)data, compare_data );
+  return data->addr;
+}
+
+int get_addr( const char *name ) {
+  GList *list = g_list_first( list_variables );
+  int result;
+  while ( NULL != list ) {
+    result = strcmp( ((Variable*) list->data)->name, name );
+    if ( result == 0 ) {
+      return ((Variable*) list->data)->addr;
+    }
+    list = g_list_next( list );
+  }
+  return -1;
+}
 
 void comment( const char *s ){
   printf( "#%s\n", s );
