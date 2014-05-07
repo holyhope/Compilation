@@ -1,15 +1,17 @@
 %{
-#include "gcc.h"
-#include <stdio.h>
-#include <stdlib.h>
-  int fileno ( FILE *stream );                  /*non ansi*/
-  enum{ booleen, entier, none } declaration;
+  #include "gcc.h"
+  #include <stdio.h>
+  #include <stdlib.h>
+    int fileno ( FILE *stream );                  /* non ansi */
+    enum{ booleen, entier, none } declaration;
 %}
+
 %option noyywrap
 /* evite d'utiliser -lfl */
+
 %%
 
-[ \t]+ ;
+[ \t\r\n]+ ;
 "="             { return EGAL; }
 
 "<"             { yylval.comparator = lt;  return COMP; }
@@ -23,20 +25,18 @@
 "-"             { yylval.operator = sub;  return ADDSUB;   }
 
 "*"             { return STAR; }
-"/"             { return DIV; }
-"%"             { return MOD; }
+"/"             { return DIV;  }
+"%"             { return MOD;  }
 
-[0-9]+                      { yylval.num   = atoi( yytext ); return NUM; }
-\*[a-zA-Z][a-zA-Z0-9_]+     { yylval.ident = yytext + 1;     return ADR; }
-
+";"             { return PV;       }
+","             { return VRG;      }
+"&"             { return ADR;      }
 "("             { return LPAR;     }
 ")"             { return RPAR;     }
 "{"             { return LACC;     }
 "}"             { return RACC;     }
 "["             { return LSQB;     }
 "]"             { return RSQB;     }
-";"             { return PV;       }
-","             { return VRG;      }
 "if"            { return IF;       }
 "else"          { return ELSE;     }
 "main"          { return MAIN;     }
@@ -51,7 +51,11 @@
 "return"        { return RETURN;   }
 "pointeur"      { return POINTEUR; }
 
-[a-zA-Z][a-zA-Z0-9_]*      { yylval.ident = yytext;   return IDENT;  }
+[0-9]+                      { yylval.num   = atoi( yytext ); return NUM; }
+\*[a-zA-Z][a-zA-Z0-9_]+     { yytext++; if ( NULL == ( yylval.ident = (char*) malloc( sizeof(char) * strlen( yytext ) ) ) ) { exit( EXIT_FAILURE ); } strcpy( yylval.ident, yytext ); return ADR;   }
+
+[a-zA-Z][a-zA-Z0-9_]*       {           if ( NULL == ( yylval.ident = (char*) malloc( sizeof(char) * strlen( yytext ) ) ) ) { exit( EXIT_FAILURE ); } strcpy( yylval.ident, yytext ); return IDENT; }
 
 .|\n return yytext[0];
+
 %%

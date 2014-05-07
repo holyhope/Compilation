@@ -1,4 +1,12 @@
-main(){
-  entier a, b;
-  entier c;
+
+
+main () {
+  entier *a, *b;
+  a = malloc( 1 );
+  *b = 5;
+  *a = 32 + *b;
+  print( *a );
+
+
+
 }
