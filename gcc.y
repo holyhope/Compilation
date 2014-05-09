@@ -83,7 +83,7 @@ FIXDeclVar:                                              { mode_declaratif = 1; 
 ListVar: ListVar VRG Variable                            {}
   | Variable                                             {}
   ;
-Variable: STAR Variable                                  {
+Variable: STAR Variable                                 {
     if ( ! mode_declaratif ) {
       instarg( "SET", $2 );
       inst( "LOADR" );
@@ -289,8 +289,36 @@ void comment( const char *s ){
 }
 
 int main( int argc, const char *argv[] ) {
-  if ( 2 == argc ) {
-    yyin = fopen( argv[1], "r" );
+  char extension[5];
+  int size = 0, i;  
+  char* argument = NULL;
+
+  if ( 2 == argc || 3 == argc ) {
+    size = strlen ( argv[1] );
+    argument = ( char* ) malloc ( ( size - 4 ) * sizeof ( char ) );
+
+    for ( i = 0 ; i < size - 4 ; i++ ) {
+      argument [i] = argv[1][i];
+    }
+    for (; i <= size ; i++ ) {
+      extension [i-4] = argv[1][i];
+    }
+    if ( strcmp ( extension, ".tpc" ) != 0 ) {
+      fprintf ( stderr, "Erreur extension, le fichier doit être du type .tpc\n" );
+      return 1;
+    }
+    if ( NULL == ( yyin = fopen( argv[1], "r" ) ) ) {
+      fprintf ( stderr, "Erreur ouverture du fichier %s \n", argv[1] );
+      return 1;
+    }
+    if ( argc == 3 && strcmp(argv[2], "-o") == 0 ){
+      strcat ( argument, ".vm" );
+      if ( NULL == ( stdout = fopen ( argument,"w" ) ) ) {
+        fprintf ( stderr, "Erreur ouverture fichier %s \n", argv[1] );
+        return 1;
+      }
+    }
+
   } else if ( 1 == argc ){
     yyin = stdin;
   } else {

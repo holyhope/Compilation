@@ -1,7 +1,7 @@
 CC=gcc
-CFLAGS=-Wall `pkg-config --cflags glib-2.0`
+CFLAGS=-Wall `pkg-config --cflags glib-2.0` -g
 LDFLAGS=`pkg-config --libs glib-2.0` #-lfl
-OUT_EXEC=super_compilator
+OUT_EXEC=tcompil
 EXEC=gcc
 
 all: $(OUT_EXEC) clean
