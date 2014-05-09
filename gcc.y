@@ -5,6 +5,8 @@
   #include <unistd.h>
   #include <glib.h>
   #include <stdbool.h>
+  #include <sys/stat.h>
+  #include <fcntl.h>
 
   #define MAX_MALLOC 1000
 
@@ -435,6 +437,7 @@ int main( int argc, const char *argv[] ) {
   char extension[5];
   int size = 0, i;  
   char* argument = NULL;
+  int out;
 
   if ( 2 == argc || 3 == argc ) {
     size = strlen ( argv[1] );
@@ -454,19 +457,21 @@ int main( int argc, const char *argv[] ) {
       fprintf ( stderr, "Erreur ouverture du fichier %s \n", argv[1] );
       return 1;
     }
-    if ( argc == 3 && strcmp(argv[2], "-o") == 0 ){
+    if ( argc == 3 && strcmp( argv[2], "-o") == 0 ){
       strcat ( argument, ".vm" );
-      if ( NULL == ( stdout = fopen ( argument,"w" ) ) ) {
-        fprintf ( stderr, "Erreur ouverture fichier %s \n", argv[1] );
-        return 1;
+      if ( -1 == ( out = open ( argument, O_TRUNC | O_WRONLY ) ) ) {
+        perror ( "open" );
+        exit( EXIT_FAILURE );
+      } else if ( -1 == dup2( STDOUT_FILENO, out ) ) {
+        perror ( "dup2" );
+        exit( EXIT_FAILURE );
       }
     }
-
   } else if ( 1 == argc ){
     yyin = stdin;
   } else {
     fprintf( stderr, "usage: %s [src]\n", argv[0] );
-    return 1;
+    exit( EXIT_FAILURE );
   }
   yyparse();
   return 0;

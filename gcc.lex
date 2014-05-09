@@ -2,8 +2,6 @@
   #include "gcc.h"
   #include <stdio.h>
   #include <stdlib.h>
-    int fileno ( FILE *stream );                  /* non ansi */
-    enum{ booleen, entier, none } declaration;
 %}
 
 %option noyywrap
