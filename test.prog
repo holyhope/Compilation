@@ -1,10 +1,9 @@
 
-
 main () {
-  entier **a;
-  **a = 1;
-print(**a);
-
-
-
+  var *a, b;
+  b = 10;
+  a = &b;
+  print( a );
+  print( *a );
+  print( b );
 }
