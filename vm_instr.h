@@ -11,7 +11,7 @@ typedef enum {
   vm_leq,
   vm_geq,
   vm_pop,
-  vm_ret,
+  vm_none,
   vm_push,
   vm_mult,
   vm_swap,
@@ -26,6 +26,7 @@ typedef enum {
   vm_great,
   vm_write,
   vm_readch,
+  vm_return,
   vm_writech,
   vm_set,
   vm_call,
@@ -33,9 +34,11 @@ typedef enum {
   vm_free,
   vm_label,
   vm_jumpf,
-  vm_alloc
+  vm_alloc,
+  vm_comment
 } vm_instr;
 
 void vm_exec( vm_instr instr, ... );
+void vm_flush();
 
 #endif
