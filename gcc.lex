@@ -2,6 +2,7 @@
   #include "gcc.h"
   #include <stdio.h>
   #include <stdlib.h>
+  #include <string.h>
 %}
 
 %option noyywrap
@@ -50,9 +51,22 @@
 "return"        { return RETURN;   }
 
 [0-9]+                      { yylval.num   = atoi( yytext ); return NUM; }
-\*[a-zA-Z][a-zA-Z0-9_]+     { yytext++; if ( NULL == ( yylval.ident = (char*) malloc( sizeof(char) * strlen( yytext ) ) ) ) { exit( EXIT_FAILURE ); } strcpy( yylval.ident, yytext ); return ADR;   }
+\*[a-zA-Z][a-zA-Z0-9_]+     {
+    yytext++;
+    if ( NULL == ( yylval.ident = (char*) malloc( sizeof(char) * strlen( yytext ) ) ) ) {
+      exit( EXIT_FAILURE );
+    }
+    strcpy( yylval.ident, yytext );
+    return ADR;
+  }
 
-[a-zA-Z][a-zA-Z0-9_]*       {           if ( NULL == ( yylval.ident = (char*) malloc( sizeof(char) * strlen( yytext ) ) ) ) { exit( EXIT_FAILURE ); } strcpy( yylval.ident, yytext ); return IDENT; }
+[a-zA-Z][a-zA-Z0-9_]*       {
+    if ( NULL == ( yylval.ident = (char*) malloc( sizeof(char) * strlen( yytext ) ) ) ) {
+      exit( EXIT_FAILURE );
+    }
+    strcpy( yylval.ident, yytext );
+    return IDENT;
+  }
 
 .|\n return yytext[0];
 

@@ -12,20 +12,40 @@
 
   typedef enum { entier, fonction, pointeur } Type;
   
-  typedef struct var {
-    char *name;                               /* Nom de la variable                */
-    Type type; /* Type de la variable               */
-    int addr;                                 /* Adresse dans la machine virtuelle */
+  typedef struct __fonction {
+    GList *variables; /* Liste des variables déclarée dans le block */
 
-    /* Dans le cas d'une fonction */
+    int label;        /* Label à CALL */
+
+    /* Dans le cas d'un block simple, nb_arguments = 0 et isvoid = true; */
+    int nb_arguments; /* Nombre d'arugments                   */
+    bool isvoid;      /* true si la fonction ne retourne rien */
+    Type *arguments;  /* Tableaux des types des arguments     */
+    Type retour;      /* Type de retour si isvoid == false    */
+  } FonctionData;
+
+  typedef struct __unamed_block {
+    GList *variables; /* Liste des variables déclarée dans le block */
+
+    int label;        /* Label à CALL */
+
+    /* Dans le cas d'un block simple, nb_arguments = 0 et isvoid = true; */
+    int nb_arguments; /* Nombre d'arugments                   */
+    bool isvoid;      /* true si la fonction ne retourne rien */
+    Type *arguments;  /* Tableaux des types des arguments     */
+    Type retour;      /* Type de retour si isvoid == false    */
+  } UnamedBlockData;
+  
+  typedef struct {
+    char *name;             /* Nom de la variable                */
+    Type type;              /* Type de la variable               */
+    int addr;               /* Adresse dans la machine virtuelle */
+    int size;               /* Taille de la variable             */
+
+    /* Données supplémentaires */
     union {
-      struct func {
-        int nb_argument;
-        Type *arguments;                     /* Arguments                          */
-        bool isvoid;
-        Type retour;                         /* Valeur de retour                   */
-      } fonction;
-      bool local;
+      FonctionData *fonction; /* Dans le cas d'une fonction */
+      UnamedBlockData *block; /* Dans le cas d'un block */
     } data;
   } VariableData;
 
@@ -43,21 +63,24 @@
   void instarg( const char *, int );
   void comment( const char * );
 
-  GList *list_variables;
+  GList *actual_variable;
 
-  VariableData *create_variable_local( const char *name, int size, Type type );
-  VariableData *create_variable_global( int size );
   VariableData *get_variable( const char *name );
   int get_addr( VariableData * );
   bool is_local( VariableData *var );
   bool is_global( VariableData *var );
   bool update_variable( VariableData *var, int value );
   bool update_variable_pop( VariableData *var );
-  VariableData *create_fonction( const char *name, int nb_arguments, int isvoid, Type retour, ... );
+  VariableData *create_fonction( const char *name, int nb_arguments, bool isvoid, ... );
+  VariableData *create_variable( const char *name, int size, Type type );
 
   void inst( const char *s );
   void instarg( const char *s, int n );
+  void call_function( VariableData * );
   void endProgram();
+
+  void end_block();
+
 %}
 
 %union {
@@ -125,18 +148,14 @@ ListVar: ListVar VRG Variable                            {}
 Variable: STAR IDENT                                     {
     VariableData *var;
     if ( mode_declaratif ) {
-      var = create_variable_local( $2, 1, pointeur );
+      var = create_variable( $2, 1, pointeur );
     } else {
       var = get_variable( $2 );
       if ( var->type != pointeur ) {
         yyerror( "la variable n'est pas un pointeur." );
       } else {
         inst( "POP" );
-        if ( var->data.local ) {
-          inst( "LOADR" );
-        } else {
-          inst( "LOAD" );
-        }
+        inst( "LOADR" );
         inst( "PUSH" );
       }
     }
@@ -145,7 +164,7 @@ Variable: STAR IDENT                                     {
   | IDENT                                                {
     VariableData *var;
     if ( mode_declaratif ) {
-      var = create_variable_local( $1, 1, entier );
+      var = create_variable( $1, 1, entier );
     } else {
       var = get_variable( $1 );
       instarg( "SET", get_addr( var ) );
@@ -156,11 +175,11 @@ Variable: STAR IDENT                                     {
   ;
 DeclMain: EnTeteMain Corps                               {}
   ;
-EnTeteMain: MAIN LPAR RPAR                               { instarg( "LABEL", 0 ); }
-  ;
-DeclFonct: DeclFonct DeclUneFonct                        {
-    
+EnTeteMain: MAIN LPAR RPAR                               { instarg( "LABEL", 0 );
+  create_fonction( "main", 0, true );
   }
+  ;
+DeclFonct: DeclFonct DeclUneFonct                        {}
   | /* epsi */
   ;
 DeclUneFonct: EnTeteFonct Corps                          { if ( ! $1 ) inst( "RETURN" );       }
@@ -174,12 +193,12 @@ Parametres: VOID                                         {}
   | ListVar                                              {}
   | /* epsi */                                 /* Élargit le langage */
   ;
-Corps: LACC DeclConst DeclVar SuiteInstr RACC            {}
+Corps: LACC DeclConst DeclVar SuiteInstr RACC            { end_block(); }
   ;
 SuiteInstr: Instr SuiteInstr                             {}
   | /* epsi */                                           {}
   ;
-InstrComp: LACC SuiteInstr RACC                          {}
+InstrComp: LACC SuiteInstr RACC                          { end_block(); }
   ;
 Instr: IDENT EGAL Exp PV                                 {
     update_variable_pop( get_variable( $1 ) );
@@ -190,22 +209,14 @@ Instr: IDENT EGAL Exp PV                                 {
       yyerror( "La variable n'est pas du bon type." );
     } else {
       instarg( "SET", get_addr( get_variable( $2 ) ) );
-      if ( var->data.local ) {
-        inst( "LOADR" );
-      } else {
-        inst( "LOAD" );
-      }
+      inst( "LOADR" );
       inst( "SWAP" );
       inst( "POP" );
-      if ( var->data.local ) {
-        inst( "SAVER" );
-      } else {
-        inst( "SAVE" );
-      }
+      inst( "SAVER" );
     }
   }
   | IDENT EGAL MALLOC LPAR Exp RPAR PV                   {
-    VariableData *global = create_variable_global( $5 );
+    VariableData *global = create_variable( "", $5, entier );
     update_variable( get_variable( $1 ), get_addr( global ) );
   }
   | FREE LPAR Exp RPAR PV                                { /* TODO */ }
@@ -280,14 +291,7 @@ Exp: Exp ADDSUB Exp                                      {
   | NUM                                                  { instarg( "SET", $$ = $1 ); inst( "PUSH" ); }
   | IDENT LPAR Arguments RPAR                            {
     VariableData *var = get_variable( $1 );
-    if ( var->type != fonction ) {
-      yyerror( "L'identifiant n'est pas une fonction.");
-    } else {
-      instarg( "CALL", get_addr( var ) );
-      if ( ! var->data.fonction.isvoid ) {
-        inst( "PUSH" ); /* Car la valeur de retour est stockée dans reg1 */
-      }
-    }
+    call_function( var );
   }
   ;
 
@@ -303,8 +307,33 @@ int yyerror( char *s ) {
   return 0;
 }
 
+void free_variable( GList *actual );
+
+void free_variable_data( VariableData *data ) {
+  free_variable( data->data.fonction->variables );
+  free( data );
+}
+
+void free_variable( GList *actual ) {
+  GList **variables = &( (VariableData*) actual->data )->data.fonction->variables;
+  while ( *variables != NULL ) {
+    free_variable_data( (*variables)->data );
+    g_list_free_1( *variables );
+  }
+  g_list_free_1( actual );
+}
+
+void free_variables() {
+  GList *variables = g_list_first( actual_variable ), *tmp;
+  while ( NULL == ( tmp = g_list_next( variables ) ) ) {
+    free_variable( tmp );
+  }
+  free_variable( variables );
+}
+
 void endProgram() {
   printf( "HALT\n" );
+  free_variables();
 }
 
 void inst( const char *s ) {
@@ -319,8 +348,9 @@ gint compare_data( gconstpointer data1, gconstpointer data2 ) {
   return strcmp( (char*)((VariableData*)data1)->name, (char*)((VariableData*)data2)->name );
 }
 
-VariableData *create_variable( const char *name, int size, int *index, Type type ) {
+VariableData *create_variable_outofrange( const char *name, int size, Type type ) {
   VariableData * data;
+  GList **local_variables;
   if ( NULL == ( data = (VariableData*) malloc( sizeof(VariableData) ) ) ) {
     exit( EXIT_FAILURE );
   }
@@ -328,30 +358,66 @@ VariableData *create_variable( const char *name, int size, int *index, Type type
     exit( EXIT_FAILURE );
   }
   strcpy( data->name, name );
-  data->addr = *index;
   data->type = type;
-  list_variables = g_list_insert_sorted( list_variables, (gpointer)data, compare_data );
+  data->size = size;
 
-  *index += size;
+  local_variables = &( (VariableData*) actual_variable->data )->data.fonction->variables;
+  if ( local_variables == NULL ) {
+    data->addr = 0;
+  } else {
+    data->addr = ( (VariableData*) (*local_variables)->data )->addr +
+      ( (VariableData*) (*local_variables)->data )->size;
+  }
+
   return data;
 }
 
-bool is_global( VariableData *var ) {
-  return var->addr < MAX_MALLOC;
+void insert_variable( VariableData *data ) {
+  actual_variable = g_list_append( actual_variable, data );
+  instarg( "ALLOC", data->size );
 }
 
-bool is_local( VariableData *var ) {
-  return ! is_global( var );
+VariableData *create_variable( const char *name, int size, Type type ) {
+  VariableData * data = create_variable_outofrange( name, size, type );
+  insert_variable( data );
+  return data;
 }
 
-int get_addr( VariableData *var ) {
-  return is_global( var ) ? var->addr : var->addr - MAX_MALLOC;
-}
+VariableData *create_fonction(
+    const char *name,
+    int nb_arguments,
+    bool isvoid,
+    ...
+    /* Le premier argument supplémentaire est le type de retour */
+    /* les reste est le type de chacun des arguments */
+  ) {
+  va_list argp;
+  int i;
+  VariableData *var = create_variable( name, 1, fonction );
 
-VariableData *create_variable_local( const char *name, int size, Type type ) {
-  VariableData *var = create_variable( name, size, &variable_local, type );
-  var->data.local = true;
-  instarg( "ALLOC", size );
+  va_start( argp, isvoid );
+
+  /* Gestion du typage */
+  if ( isvoid ) {
+    var->data.fonction->isvoid = true;
+  } else {
+    var->data.fonction->isvoid = false;
+    var->data.fonction->retour = va_arg( argp, Type );
+  }
+
+  /* Gestion des listes */
+  var->data.fonction->variables = NULL;
+  actual_variable = g_list_last( actual_variable );
+
+  /* Gestion des arguments */
+  var->data.fonction->nb_arguments = nb_arguments;
+  for ( i = 0; i < nb_arguments; i++ ) {
+    insert_variable( va_arg( argp, VariableData* ) );
+  }
+
+  va_end( argp );
+
+
   return var;
 }
 
@@ -371,6 +437,18 @@ bool update_variable( VariableData *var, int value ) {
   return var;
 }
 
+bool is_global( VariableData *var ) {
+  return var->addr < MAX_MALLOC;
+}
+
+bool is_local( VariableData *var ) {
+  return ! is_global( var );
+}
+
+int get_addr( VariableData *var ) {
+  return is_global( var ) ? var->addr : var->addr - MAX_MALLOC;
+}
+
 bool update_variable_pop( VariableData *var ) {
   if ( var->type == fonction ) {
     yyerror( "Impossible de modifier une fonction." );
@@ -387,46 +465,37 @@ bool update_variable_pop( VariableData *var ) {
   return var;
 }
 
-VariableData *create_variable_global( int size ) {
-  VariableData *var = create_variable( "", size, &variable_global, entier );
-  var->data.local = false;
-  return var;
+void call_function( VariableData *var ) {
+  if ( var->type != fonction ) {
+    yyerror( "L'identifiant n'est pas une fonction.");
+  } else {
+    instarg( "CALL", get_addr( var ) );
+    if ( ! var->data.fonction->isvoid ) {
+      inst( "PUSH" ); /* Car la valeur de retour est stockée dans reg1 */
+    }
+  }
 }
 
-VariableData *create_fonction( const char *name, int nb_arguments, int isvoid, Type retour, ... ) {
-  va_list argp;
-  int i;
-  VariableData *var = create_variable( name, 1, &variable_local, fonction );
-
-  if ( isvoid ) {
-    var->data.fonction.isvoid = true;
-  } else {
-    var->data.fonction.retour = retour;
+void end_block() {
+  GList *list = actual_variable;
+  while ( list != NULL ) {
+    if ( ( (VariableData*) list->data )->type == fonction ) {
+      actual_variable = list;
+      return;
+    }
   }
-
-  va_start( argp, retour );
-  for ( i = 0; i < nb_arguments; i++ ) {
-    var->data.fonction.arguments[ i ] = va_arg( argp, Type );
-  }
-  va_end( argp );
-
-  return var;
 }
 
 VariableData *get_variable( const char *name ) {
-  GList *list = g_list_first( list_variables );
+  GList *list = ( (VariableData*) actual_variable->data )->data.fonction->variables;
   while ( NULL != list ) {
     if ( strcmp( ((VariableData*) list->data)->name, name ) == 0 ) {
       return (VariableData*) list->data;
     }
-    list = g_list_next( list );
+    list = g_list_previous( list );
   }
   yyerror( "syntax error: variable non déclarée." );
   exit( EXIT_FAILURE );
-}
-
-void free_variables() {
-  /* TODO */
 }
 
 void comment( const char *s ) {
