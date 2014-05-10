@@ -6,7 +6,7 @@ EXEC=gcc
 
 all: $(OUT_EXEC) clean
 
-$(OUT_EXEC): $(EXEC).o lex.yy.o
+$(OUT_EXEC): $(EXEC).o lex.yy.o vm_instr.o
 	$(CC)  -o $@ $^ $(LDFLAGS)
 
 $(EXEC).c: $(EXEC).y
