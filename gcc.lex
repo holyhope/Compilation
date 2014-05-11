@@ -2,6 +2,9 @@
   #include "gcc.h"
   #include <stdio.h>
   #include <stdlib.h>
+  #include <string.h>
+  int asprintf( char **strp, const char *fmt, ... );
+  int fileno( FILE* );
 %}
 
 %option noyywrap
@@ -9,7 +12,7 @@
 
 %%
 
-[ \t\r\n]+ ;
+"\n"            { return NEW_LINE; }
 "="             { return EGAL; }
 
 "<"             { yylval.comparator = lt;  return COMP; }
@@ -49,11 +52,12 @@
 "malloc"        { return MALLOC;   }
 "return"        { return RETURN;   }
 
-[0-9]+                      { yylval.num   = atoi( yytext ); return NUM; }
-\*[a-zA-Z][a-zA-Z0-9_]+     { yytext++; if ( NULL == ( yylval.ident = (char*) malloc( sizeof(char) * strlen( yytext ) ) ) ) { exit( EXIT_FAILURE ); } strcpy( yylval.ident, yytext ); return ADR;   }
+[0-9]+                 { yylval.num   = atoi( yytext ); return NUM; }
 
-[a-zA-Z][a-zA-Z0-9_]*       {           if ( NULL == ( yylval.ident = (char*) malloc( sizeof(char) * strlen( yytext ) ) ) ) { exit( EXIT_FAILURE ); } strcpy( yylval.ident, yytext ); return IDENT; }
+[a-zA-Z][a-zA-Z0-9_]*  { asprintf( &yylval.ident, "%s", yytext ); return IDENT; }
 
-.|\n return yytext[0];
+[ \t\r]+        {}
+
+. { return yytext[0]; }
 
 %%

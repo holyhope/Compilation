@@ -22,51 +22,46 @@ int vm_nb_arg( vm_instr instr ) {
   return -1;
 }
 
-char *vm_command( vm_instr instr, va_list argp ) {
+static char *vm_command( vm_instr instr, va_list argp ) {
   int asprintf( char **strp, const char *fmt, ... );
   char *instruction;
   int tmp;
-  void *param;
-  
-  if ( vm_nb_arg( instr ) ) {
-    param = va_arg( argp, void* );
-  }
 
   switch ( instr ) {
-    default:         tmp = asprintf( &instruction, "" );              break;
-    case vm_neg:     tmp = asprintf( &instruction, "%s", "NEG" );     break;
-    case vm_add:     tmp = asprintf( &instruction, "%s", "ADD" );     break;
-    case vm_sub:     tmp = asprintf( &instruction, "%s", "SUB" );     break;
-    case vm_div:     tmp = asprintf( &instruction, "%s", "DIV" );     break;
-    case vm_mod:     tmp = asprintf( &instruction, "%s", "MOD" );     break;
-    case vm_low:     tmp = asprintf( &instruction, "%s", "LOW" );     break;
-    case vm_leq:     tmp = asprintf( &instruction, "%s", "LEQ" );     break;
-    case vm_geq:     tmp = asprintf( &instruction, "%s", "GEQ" );     break;
-    case vm_pop:     tmp = asprintf( &instruction, "%s", "POP" );     break;
-    case vm_push:    tmp = asprintf( &instruction, "%s", "PUSH" );    break;
-    case vm_mult:    tmp = asprintf( &instruction, "%s", "MULT" );    break;
-    case vm_swap:    tmp = asprintf( &instruction, "%s", "SWAP" );    break;
-    case vm_halt:    tmp = asprintf( &instruction, "%s", "HALT" );    break;
-    case vm_read:    tmp = asprintf( &instruction, "%s", "READ" );    break;
-    case vm_load:    tmp = asprintf( &instruction, "%s", "LOAD" );    break;
-    case vm_save:    tmp = asprintf( &instruction, "%s", "SAVE" );    break;
-    case vm_saver:   tmp = asprintf( &instruction, "%s", "SAVER" );   break;
-    case vm_loadr:   tmp = asprintf( &instruction, "%s", "LOADR" );   break;
-    case vm_equal:   tmp = asprintf( &instruction, "%s", "EQUAL" );   break;
-    case vm_noteq:   tmp = asprintf( &instruction, "%s", "NOTEQ" );   break;
-    case vm_great:   tmp = asprintf( &instruction, "%s", "GREAT" );   break;
-    case vm_write:   tmp = asprintf( &instruction, "%s", "WRITE" );   break;
-    case vm_readch:  tmp = asprintf( &instruction, "%s", "READCH" );  break;
-    case vm_return:  tmp = asprintf( &instruction, "%s", "RETURN" );  break;
+    default:         tmp = asprintf( &instruction, ""              ); break;
+    case vm_neg:     tmp = asprintf( &instruction, "%s", "NEG"     ); break;
+    case vm_add:     tmp = asprintf( &instruction, "%s", "ADD"     ); break;
+    case vm_sub:     tmp = asprintf( &instruction, "%s", "SUB"     ); break;
+    case vm_div:     tmp = asprintf( &instruction, "%s", "DIV"     ); break;
+    case vm_mod:     tmp = asprintf( &instruction, "%s", "MOD"     ); break;
+    case vm_low:     tmp = asprintf( &instruction, "%s", "LOW"     ); break;
+    case vm_leq:     tmp = asprintf( &instruction, "%s", "LEQ"     ); break;
+    case vm_geq:     tmp = asprintf( &instruction, "%s", "GEQ"     ); break;
+    case vm_pop:     tmp = asprintf( &instruction, "%s", "POP"     ); break;
+    case vm_push:    tmp = asprintf( &instruction, "%s", "PUSH"    ); break;
+    case vm_mult:    tmp = asprintf( &instruction, "%s", "MULT"    ); break;
+    case vm_swap:    tmp = asprintf( &instruction, "%s", "SWAP"    ); break;
+    case vm_halt:    tmp = asprintf( &instruction, "%s", "HALT"    ); break;
+    case vm_read:    tmp = asprintf( &instruction, "%s", "READ"    ); break;
+    case vm_load:    tmp = asprintf( &instruction, "%s", "LOAD"    ); break;
+    case vm_save:    tmp = asprintf( &instruction, "%s", "SAVE"    ); break;
+    case vm_saver:   tmp = asprintf( &instruction, "%s", "SAVER"   ); break;
+    case vm_loadr:   tmp = asprintf( &instruction, "%s", "LOADR"   ); break;
+    case vm_equal:   tmp = asprintf( &instruction, "%s", "EQUAL"   ); break;
+    case vm_noteq:   tmp = asprintf( &instruction, "%s", "NOTEQ"   ); break;
+    case vm_great:   tmp = asprintf( &instruction, "%s", "GREAT"   ); break;
+    case vm_write:   tmp = asprintf( &instruction, "%s", "WRITE"   ); break;
+    case vm_readch:  tmp = asprintf( &instruction, "%s", "READCH"  ); break;
+    case vm_return:  tmp = asprintf( &instruction, "%s", "RETURN"  ); break;
     case vm_writech: tmp = asprintf( &instruction, "%s", "WRITECH" ); break;
-    case vm_set:     tmp = asprintf( &instruction, "%s %d", "SET",   param ); break;
-    case vm_call:    tmp = asprintf( &instruction, "%s %d", "CALL",  param ); break;
-    case vm_jump:    tmp = asprintf( &instruction, "%s %d", "JUMP",  param ); break;
-    case vm_free:    tmp = asprintf( &instruction, "%s %d", "FREE",  param ); break;
-    case vm_label:   tmp = asprintf( &instruction, "%s %d", "LABEL", param ); break;
-    case vm_jumpf:   tmp = asprintf( &instruction, "%s %d", "JUMPF", param ); break;
-    case vm_alloc:   tmp = asprintf( &instruction, "%s %d", "ALLOC", param ); break;
-    case vm_comment: tmp = asprintf( &instruction, "%s%s",  "#",     param ); break;
+    case vm_set:     tmp = asprintf( &instruction, "%s %d", "SET",   va_arg( argp, int   ) ); break;
+    case vm_call:    tmp = asprintf( &instruction, "%s %u", "CALL",  va_arg( argp, int   ) ); break;
+    case vm_jump:    tmp = asprintf( &instruction, "%s %u", "JUMP",  va_arg( argp, int   ) ); break;
+    case vm_free:    tmp = asprintf( &instruction, "%s %d", "FREE",  va_arg( argp, int   ) ); break;
+    case vm_label:   tmp = asprintf( &instruction, "%s %u", "LABEL", va_arg( argp, int   ) ); break;
+    case vm_jumpf:   tmp = asprintf( &instruction, "%s %u", "JUMPF", va_arg( argp, int   ) ); break;
+    case vm_alloc:   tmp = asprintf( &instruction, "%s %d", "ALLOC", va_arg( argp, int   ) ); break;
+    case vm_comment: tmp = asprintf( &instruction, "%s%s",  "#",     va_arg( argp, char* ) ); break;
   }
 
   if ( tmp == -1 ) {
@@ -77,14 +72,17 @@ char *vm_command( vm_instr instr, va_list argp ) {
   return instruction;
 }
 
-enum{ both, none, first, second } is_usefull( vm_instr instr1, vm_instr instr2 ) {
-  if ( instr1 == vm_none && instr2 == vm_none ) {
-    return none;
-  }
-  if ( instr1 == vm_none ) {
+#ifdef VM_OPTIMIZE
+static enum { both, none, first, second } is_usefull(
+    vm_instr instr1,
+    vm_instr instr2
+  ) {
+  if ( instr1 == vm_none || instr1 == vm_comment ) {
+    if ( instr2 == vm_none || instr2 == vm_comment ) {
+      return none;
+    }
     return second;
-  }
-  if ( instr2 == vm_none ) {
+  } else if ( instr2 == vm_none || instr2 == vm_comment ) {
     return first;
   }
   if ( instr1 == vm_push && instr2 == vm_pop ) {
@@ -96,12 +94,23 @@ enum{ both, none, first, second } is_usefull( vm_instr instr1, vm_instr instr2 )
   if ( instr1 == vm_swap && instr2 == vm_swap ) {
     return none;
   }
+  if (
+      instr2 != vm_label &&
+      (
+        instr1 == vm_return ||
+        instr1 == vm_jump   ||
+        instr1 == vm_halt
+      )
+    ) {
+    return first;
+  }
   return both;
 }
 
+static vm_instr previous_command = vm_none;
+static char *previous_exec = NULL;
+
 void vm_exec( vm_instr instr, ... ) {
-  static vm_instr previous_command = vm_none;
-  static char *previous_exec = NULL;
   va_list argp;
 
   switch ( is_usefull( previous_command, instr ) ) {
@@ -125,5 +134,23 @@ void vm_exec( vm_instr instr, ... ) {
 }
 
 void vm_flush() {
-  vm_exec( vm_comment, "Fin du program. Optimized." );
+  if ( previous_command != vm_none ) {
+    printf( "%s\n", previous_exec );
+    free( previous_exec );
+    previous_command = vm_none;
+  }
 }
+#else
+void vm_exec( vm_instr instr, ... ) {
+  char *exec;
+  va_list argp;
+  va_start( argp, instr );
+  exec = vm_command( instr, argp );
+  printf( "%s\n", exec );
+  free( exec );
+  va_end( argp );
+}
+
+void vm_flush() {
+}
+#endif

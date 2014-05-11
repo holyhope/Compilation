@@ -38,7 +38,8 @@ typedef enum {
   vm_comment
 } vm_instr;
 
-void vm_exec( vm_instr instr, ... );
+int vm_nb_arg( vm_instr );
+void vm_exec( vm_instr, ... );
 void vm_flush();
 
 #endif

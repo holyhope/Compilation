@@ -1,12 +1,20 @@
-CC=gcc
-CFLAGS=-Wall `pkg-config --cflags glib-2.0` -g
-LDFLAGS=`pkg-config --libs glib-2.0` #-lfl
+CC=colorgcc
+############################# DEBUG FLAGS ##############################
+CFLAGS=-Wall -ansi `pkg-config --cflags glib-2.0` -g -lmcheck
+LDFLAGS=`pkg-config --libs glib-2.0`
+########################## PRODUCTION FLAGS ############################
+#CFLAGS=`pkg-config --cflags glib-2.0` -DNDEBUG -O2 -DVM_OPTIMIZE
+#LDFLAGS=`pkg-config --libs glib-2.0`
+########################################################################
 OUT_EXEC=tcompil
 EXEC=gcc
 
-all: $(OUT_EXEC) clean
+all: clear $(OUT_EXEC) clean
 
-$(OUT_EXEC): $(EXEC).o lex.yy.o
+clear:
+	clear && clear
+
+$(OUT_EXEC): $(EXEC).o lex.yy.o vm_instr.o
 	$(CC)  -o $@ $^ $(LDFLAGS)
 
 $(EXEC).c: $(EXEC).y
@@ -24,4 +32,4 @@ clean:
 	rm -f *.o lex.yy.c $(EXEC).[ch]
 
 mrproper: clean
-	rm -f $(EXEC)
+	rm -f $(OUT_EXEC)
