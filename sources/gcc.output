@@ -1,0 +1,1919 @@
+Terminals unused in grammar
+
+   "<"
+   ">"
+   "<="
+   "=>"
+   "=="
+   "!="
+   "+"
+   "-"
+   "*"
+   "/"
+   UMINUS
+   LSQB
+   RSQB
+
+
+État 36conflits: 4 décalage/réduction
+État 48conflits: 4 décalage/réduction
+État 49conflits: 4 décalage/réduction
+État 50conflits: 4 décalage/réduction
+État 51conflits: 4 décalage/réduction
+État 101conflits: 5 décalage/réduction
+État 123conflits: 5 décalage/réduction
+État 124conflits: 5 décalage/réduction
+État 125conflits: 5 décalage/réduction
+État 126conflits: 5 décalage/réduction
+État 127conflits: 5 décalage/réduction
+État 141conflits: 1 décalage/réduction
+
+
+Grammaire
+
+    0 $accept: prog $end
+
+    1 prog: Fixprog DeclConst DeclVar DeclFonct DeclMain
+
+    2 Fixprog: /* vide */
+
+    3 DeclConst: DeclConst CONST ListConst PV
+    4          | /* vide */
+
+    5 ListConst: ListConst VRG IDENT EGAL NombreSigne
+    6          | IDENT EGAL NombreSigne
+
+    7 NombreSigne: NUM
+    8            | ADDSUB NombreSigne
+    9            | NombreSigne ADDSUB NombreSigne
+   10            | NombreSigne STAR NombreSigne
+   11            | NombreSigne DIV NombreSigne
+   12            | NombreSigne MOD NombreSigne
+
+   13 DeclVar: DeclVar VAR FIXDeclVar ListVar PV
+   14        | /* vide */
+
+   15 FIXDeclVar: /* vide */
+
+   16 ListVar: ListVar VRG Variable
+   17        | Variable
+
+   18 Variable: STAR Variable
+   19         | IDENT
+
+   20 DeclMain: EnTeteMain Corps
+
+   21 EnTeteMain: MAIN LPAR RPAR
+
+   22 DeclFonct: DeclFonct DeclUneFonct
+   23          | /* vide */
+
+   24 DeclUneFonct: EnTeteFonct Corps
+
+   25 EnTeteFonct: Type IDENT LPAR Parametres RPAR
+
+   26 Type: ENTIER
+   27     | VOID
+
+   28 Parametres: VOID
+   29           | ListVar
+   30           | /* vide */
+
+   31 Corps: LACC DeclConst DeclVar SuiteInstr RACC
+
+   32 SuiteInstr: Instr SuiteInstr
+   33           | /* vide */
+
+   34 InstrComp: LACC SuiteInstr RACC
+
+   35 Instr: IDENT EGAL Exp PV
+   36      | STAR IDENT EGAL Exp PV
+   37      | IDENT EGAL MALLOC LPAR Exp RPAR PV
+   38      | FREE LPAR Exp RPAR PV
+   39      | IF LPAR Exp RPAR FIXIF Instr
+   40      | IF LPAR Exp RPAR FIXIF Instr ELSE FIXELSE Instr
+   41      | WHILE WHILESTART LPAR Exp RPAR WHILETEST Instr
+   42      | RETURN Exp PV
+   43      | RETURN PV
+   44      | READ LPAR IDENT RPAR PV
+   45      | PRINT LPAR Exp RPAR PV
+   46      | IDENT LPAR Arguments RPAR PV
+   47      | PV
+   48      | InstrComp
+
+   49 Arguments: ListExp
+   50          | /* vide */
+
+   51 ListExp: ListExp VRG Exp
+   52        | Exp
+
+   53 Exp: Exp ADDSUB Exp
+   54    | Exp STAR Exp
+   55    | Exp DIV Exp
+   56    | Exp MOD Exp
+   57    | Exp COMP Exp
+   58    | ADDSUB Exp
+   59    | LPAR Exp RPAR
+   60    | Variable
+   61    | ADR Variable
+   62    | NUM
+   63    | IDENT LPAR Arguments RPAR
+
+   64 FIXIF: /* vide */
+
+   65 FIXELSE: /* vide */
+
+   66 WHILESTART: /* vide */
+
+   67 WHILETEST: /* vide */
+
+
+Terminaux, suivis des règles où ils apparaissent
+
+$end (0) 0
+error (256)
+"<" (258)
+">" (259)
+"<=" (260)
+"=>" (261)
+"==" (262)
+"!=" (263)
+"+" (264)
+"-" (265)
+"*" (266)
+"/" (267)
+UMINUS (268)
+ADDSUB_UNAIRE (269)
+ADR (270) 61
+COMP (271) 57
+ADDSUB (272) 8 9 53 58
+NUM (273) 7 62
+IDENT (274) 5 6 19 25 35 36 37 44 46 63
+DIV (275) 11 55
+STAR (276) 10 18 36 54
+MOD (277) 12 56
+MALLOC (278) 37
+FREE (279) 38
+PRINT (280) 45
+READ (281) 44
+MAIN (282) 21
+VRG (283) 5 16 51
+PV (284) 3 13 35 36 37 38 42 43 44 45 46 47
+EGAL (285) 5 6 35 36 37
+RETURN (286) 42 43
+IF (287) 39 40
+ELSE (288) 40
+WHILE (289) 41
+LPAR (290) 21 25 37 38 39 40 41 44 45 46 59 63
+RPAR (291) 21 25 37 38 39 40 41 44 45 46 59 63
+LACC (292) 31 34
+RACC (293) 31 34
+LSQB (294)
+RSQB (295)
+VOID (296) 27 28
+VAR (297) 13
+ENTIER (298) 26
+CONST (299) 3
+ENDIF (300)
+
+
+Non-terminaux, suivis des règles où ils apparaissent
+
+$accept (46)
+    à gauche: 0
+prog (47)
+    à gauche: 1, à droite: 0
+Fixprog (48)
+    à gauche: 2, à droite: 1
+DeclConst (49)
+    à gauche: 3 4, à droite: 1 3 31
+ListConst (50)
+    à gauche: 5 6, à droite: 3 5
+NombreSigne (51)
+    à gauche: 7 8 9 10 11 12, à droite: 5 6 8 9 10 11 12
+DeclVar (52)
+    à gauche: 13 14, à droite: 1 13 31
+FIXDeclVar (53)
+    à gauche: 15, à droite: 13
+ListVar (54)
+    à gauche: 16 17, à droite: 13 16 29
+Variable (55)
+    à gauche: 18 19, à droite: 16 17 18 60 61
+DeclMain (56)
+    à gauche: 20, à droite: 1
+EnTeteMain (57)
+    à gauche: 21, à droite: 20
+DeclFonct (58)
+    à gauche: 22 23, à droite: 1 22
+DeclUneFonct (59)
+    à gauche: 24, à droite: 22
+EnTeteFonct (60)
+    à gauche: 25, à droite: 24
+Type (61)
+    à gauche: 26 27, à droite: 25
+Parametres (62)
+    à gauche: 28 29 30, à droite: 25
+Corps (63)
+    à gauche: 31, à droite: 20 24
+SuiteInstr (64)
+    à gauche: 32 33, à droite: 31 32 34
+InstrComp (65)
+    à gauche: 34, à droite: 48
+Instr (66)
+    à gauche: 35 36 37 38 39 40 41 42 43 44 45 46 47 48, à droite:
+    32 39 40 41
+Arguments (67)
+    à gauche: 49 50, à droite: 46 63
+ListExp (68)
+    à gauche: 51 52, à droite: 49 51
+Exp (69)
+    à gauche: 53 54 55 56 57 58 59 60 61 62 63, à droite: 35 36 37
+    38 39 40 41 42 45 51 52 53 54 55 56 57 58 59
+FIXIF (70)
+    à gauche: 64, à droite: 39 40
+FIXELSE (71)
+    à gauche: 65, à droite: 40
+WHILESTART (72)
+    à gauche: 66, à droite: 41
+WHILETEST (73)
+    à gauche: 67, à droite: 41
+
+
+état 0
+
+    0 $accept: . prog $end
+
+    $défaut  réduction par utilisation de la règle 2 (Fixprog)
+
+    prog     aller à l'état 1
+    Fixprog  aller à l'état 2
+
+
+état 1
+
+    0 $accept: prog . $end
+
+    $end  décalage et aller à l'état 3
+
+
+état 2
+
+    1 prog: Fixprog . DeclConst DeclVar DeclFonct DeclMain
+
+    $défaut  réduction par utilisation de la règle 4 (DeclConst)
+
+    DeclConst  aller à l'état 4
+
+
+état 3
+
+    0 $accept: prog $end .
+
+    $défaut  accepter
+
+
+état 4
+
+    1 prog: Fixprog DeclConst . DeclVar DeclFonct DeclMain
+    3 DeclConst: DeclConst . CONST ListConst PV
+
+    CONST  décalage et aller à l'état 5
+
+    $défaut  réduction par utilisation de la règle 14 (DeclVar)
+
+    DeclVar  aller à l'état 6
+
+
+état 5
+
+    3 DeclConst: DeclConst CONST . ListConst PV
+
+    IDENT  décalage et aller à l'état 7
+
+    ListConst  aller à l'état 8
+
+
+état 6
+
+    1 prog: Fixprog DeclConst DeclVar . DeclFonct DeclMain
+   13 DeclVar: DeclVar . VAR FIXDeclVar ListVar PV
+
+    VAR  décalage et aller à l'état 9
+
+    $défaut  réduction par utilisation de la règle 23 (DeclFonct)
+
+    DeclFonct  aller à l'état 10
+
+
+état 7
+
+    6 ListConst: IDENT . EGAL NombreSigne
+
+    EGAL  décalage et aller à l'état 11
+
+
+état 8
+
+    3 DeclConst: DeclConst CONST ListConst . PV
+    5 ListConst: ListConst . VRG IDENT EGAL NombreSigne
+
+    VRG  décalage et aller à l'état 12
+    PV   décalage et aller à l'état 13
+
+
+état 9
+
+   13 DeclVar: DeclVar VAR . FIXDeclVar ListVar PV
+
+    $défaut  réduction par utilisation de la règle 15 (FIXDeclVar)
+
+    FIXDeclVar  aller à l'état 14
+
+
+état 10
+
+    1 prog: Fixprog DeclConst DeclVar DeclFonct . DeclMain
+   22 DeclFonct: DeclFonct . DeclUneFonct
+
+    MAIN    décalage et aller à l'état 15
+    VOID    décalage et aller à l'état 16
+    ENTIER  décalage et aller à l'état 17
+
+    DeclMain      aller à l'état 18
+    EnTeteMain    aller à l'état 19
+    DeclUneFonct  aller à l'état 20
+    EnTeteFonct   aller à l'état 21
+    Type          aller à l'état 22
+
+
+état 11
+
+    6 ListConst: IDENT EGAL . NombreSigne
+
+    ADDSUB  décalage et aller à l'état 23
+    NUM     décalage et aller à l'état 24
+
+    NombreSigne  aller à l'état 25
+
+
+état 12
+
+    5 ListConst: ListConst VRG . IDENT EGAL NombreSigne
+
+    IDENT  décalage et aller à l'état 26
+
+
+état 13
+
+    3 DeclConst: DeclConst CONST ListConst PV .
+
+    $défaut  réduction par utilisation de la règle 3 (DeclConst)
+
+
+état 14
+
+   13 DeclVar: DeclVar VAR FIXDeclVar . ListVar PV
+
+    IDENT  décalage et aller à l'état 27
+    STAR   décalage et aller à l'état 28
+
+    ListVar   aller à l'état 29
+    Variable  aller à l'état 30
+
+
+état 15
+
+   21 EnTeteMain: MAIN . LPAR RPAR
+
+    LPAR  décalage et aller à l'état 31
+
+
+état 16
+
+   27 Type: VOID .
+
+    $défaut  réduction par utilisation de la règle 27 (Type)
+
+
+état 17
+
+   26 Type: ENTIER .
+
+    $défaut  réduction par utilisation de la règle 26 (Type)
+
+
+état 18
+
+    1 prog: Fixprog DeclConst DeclVar DeclFonct DeclMain .
+
+    $défaut  réduction par utilisation de la règle 1 (prog)
+
+
+état 19
+
+   20 DeclMain: EnTeteMain . Corps
+
+    LACC  décalage et aller à l'état 32
+
+    Corps  aller à l'état 33
+
+
+état 20
+
+   22 DeclFonct: DeclFonct DeclUneFonct .
+
+    $défaut  réduction par utilisation de la règle 22 (DeclFonct)
+
+
+état 21
+
+   24 DeclUneFonct: EnTeteFonct . Corps
+
+    LACC  décalage et aller à l'état 32
+
+    Corps  aller à l'état 34
+
+
+état 22
+
+   25 EnTeteFonct: Type . IDENT LPAR Parametres RPAR
+
+    IDENT  décalage et aller à l'état 35
+
+
+état 23
+
+    8 NombreSigne: ADDSUB . NombreSigne
+
+    ADDSUB  décalage et aller à l'état 23
+    NUM     décalage et aller à l'état 24
+
+    NombreSigne  aller à l'état 36
+
+
+état 24
+
+    7 NombreSigne: NUM .
+
+    $défaut  réduction par utilisation de la règle 7 (NombreSigne)
+
+
+état 25
+
+    6 ListConst: IDENT EGAL NombreSigne .
+    9 NombreSigne: NombreSigne . ADDSUB NombreSigne
+   10            | NombreSigne . STAR NombreSigne
+   11            | NombreSigne . DIV NombreSigne
+   12            | NombreSigne . MOD NombreSigne
+
+    ADDSUB  décalage et aller à l'état 37
+    DIV     décalage et aller à l'état 38
+    STAR    décalage et aller à l'état 39
+    MOD     décalage et aller à l'état 40
+
+    $défaut  réduction par utilisation de la règle 6 (ListConst)
+
+
+état 26
+
+    5 ListConst: ListConst VRG IDENT . EGAL NombreSigne
+
+    EGAL  décalage et aller à l'état 41
+
+
+état 27
+
+   19 Variable: IDENT .
+
+    $défaut  réduction par utilisation de la règle 19 (Variable)
+
+
+état 28
+
+   18 Variable: STAR . Variable
+
+    IDENT  décalage et aller à l'état 27
+    STAR   décalage et aller à l'état 28
+
+    Variable  aller à l'état 42
+
+
+état 29
+
+   13 DeclVar: DeclVar VAR FIXDeclVar ListVar . PV
+   16 ListVar: ListVar . VRG Variable
+
+    VRG  décalage et aller à l'état 43
+    PV   décalage et aller à l'état 44
+
+
+état 30
+
+   17 ListVar: Variable .
+
+    $défaut  réduction par utilisation de la règle 17 (ListVar)
+
+
+état 31
+
+   21 EnTeteMain: MAIN LPAR . RPAR
+
+    RPAR  décalage et aller à l'état 45
+
+
+état 32
+
+   31 Corps: LACC . DeclConst DeclVar SuiteInstr RACC
+
+    $défaut  réduction par utilisation de la règle 4 (DeclConst)
+
+    DeclConst  aller à l'état 46
+
+
+état 33
+
+   20 DeclMain: EnTeteMain Corps .
+
+    $défaut  réduction par utilisation de la règle 20 (DeclMain)
+
+
+état 34
+
+   24 DeclUneFonct: EnTeteFonct Corps .
+
+    $défaut  réduction par utilisation de la règle 24 (DeclUneFonct)
+
+
+état 35
+
+   25 EnTeteFonct: Type IDENT . LPAR Parametres RPAR
+
+    LPAR  décalage et aller à l'état 47
+
+
+état 36
+
+    8 NombreSigne: ADDSUB NombreSigne .
+    9            | NombreSigne . ADDSUB NombreSigne
+   10            | NombreSigne . STAR NombreSigne
+   11            | NombreSigne . DIV NombreSigne
+   12            | NombreSigne . MOD NombreSigne
+
+    ADDSUB  décalage et aller à l'état 37
+    DIV     décalage et aller à l'état 38
+    STAR    décalage et aller à l'état 39
+    MOD     décalage et aller à l'état 40
+
+    ADDSUB    [réduction par utilisation de la règle 8 (NombreSigne)]
+    DIV       [réduction par utilisation de la règle 8 (NombreSigne)]
+    STAR      [réduction par utilisation de la règle 8 (NombreSigne)]
+    MOD       [réduction par utilisation de la règle 8 (NombreSigne)]
+    $défaut  réduction par utilisation de la règle 8 (NombreSigne)
+
+
+état 37
+
+    9 NombreSigne: NombreSigne ADDSUB . NombreSigne
+
+    ADDSUB  décalage et aller à l'état 23
+    NUM     décalage et aller à l'état 24
+
+    NombreSigne  aller à l'état 48
+
+
+état 38
+
+   11 NombreSigne: NombreSigne DIV . NombreSigne
+
+    ADDSUB  décalage et aller à l'état 23
+    NUM     décalage et aller à l'état 24
+
+    NombreSigne  aller à l'état 49
+
+
+état 39
+
+   10 NombreSigne: NombreSigne STAR . NombreSigne
+
+    ADDSUB  décalage et aller à l'état 23
+    NUM     décalage et aller à l'état 24
+
+    NombreSigne  aller à l'état 50
+
+
+état 40
+
+   12 NombreSigne: NombreSigne MOD . NombreSigne
+
+    ADDSUB  décalage et aller à l'état 23
+    NUM     décalage et aller à l'état 24
+
+    NombreSigne  aller à l'état 51
+
+
+état 41
+
+    5 ListConst: ListConst VRG IDENT EGAL . NombreSigne
+
+    ADDSUB  décalage et aller à l'état 23
+    NUM     décalage et aller à l'état 24
+
+    NombreSigne  aller à l'état 52
+
+
+état 42
+
+   18 Variable: STAR Variable .
+
+    $défaut  réduction par utilisation de la règle 18 (Variable)
+
+
+état 43
+
+   16 ListVar: ListVar VRG . Variable
+
+    IDENT  décalage et aller à l'état 27
+    STAR   décalage et aller à l'état 28
+
+    Variable  aller à l'état 53
+
+
+état 44
+
+   13 DeclVar: DeclVar VAR FIXDeclVar ListVar PV .
+
+    $défaut  réduction par utilisation de la règle 13 (DeclVar)
+
+
+état 45
+
+   21 EnTeteMain: MAIN LPAR RPAR .
+
+    $défaut  réduction par utilisation de la règle 21 (EnTeteMain)
+
+
+état 46
+
+    3 DeclConst: DeclConst . CONST ListConst PV
+   31 Corps: LACC DeclConst . DeclVar SuiteInstr RACC
+
+    CONST  décalage et aller à l'état 5
+
+    $défaut  réduction par utilisation de la règle 14 (DeclVar)
+
+    DeclVar  aller à l'état 54
+
+
+état 47
+
+   25 EnTeteFonct: Type IDENT LPAR . Parametres RPAR
+
+    IDENT  décalage et aller à l'état 27
+    STAR   décalage et aller à l'état 28
+    VOID   décalage et aller à l'état 55
+
+    $défaut  réduction par utilisation de la règle 30 (Parametres)
+
+    ListVar     aller à l'état 56
+    Variable    aller à l'état 30
+    Parametres  aller à l'état 57
+
+
+état 48
+
+    9 NombreSigne: NombreSigne . ADDSUB NombreSigne
+    9            | NombreSigne ADDSUB NombreSigne .
+   10            | NombreSigne . STAR NombreSigne
+   11            | NombreSigne . DIV NombreSigne
+   12            | NombreSigne . MOD NombreSigne
+
+    ADDSUB  décalage et aller à l'état 37
+    DIV     décalage et aller à l'état 38
+    STAR    décalage et aller à l'état 39
+    MOD     décalage et aller à l'état 40
+
+    ADDSUB    [réduction par utilisation de la règle 9 (NombreSigne)]
+    DIV       [réduction par utilisation de la règle 9 (NombreSigne)]
+    STAR      [réduction par utilisation de la règle 9 (NombreSigne)]
+    MOD       [réduction par utilisation de la règle 9 (NombreSigne)]
+    $défaut  réduction par utilisation de la règle 9 (NombreSigne)
+
+
+état 49
+
+    9 NombreSigne: NombreSigne . ADDSUB NombreSigne
+   10            | NombreSigne . STAR NombreSigne
+   11            | NombreSigne . DIV NombreSigne
+   11            | NombreSigne DIV NombreSigne .
+   12            | NombreSigne . MOD NombreSigne
+
+    ADDSUB  décalage et aller à l'état 37
+    DIV     décalage et aller à l'état 38
+    STAR    décalage et aller à l'état 39
+    MOD     décalage et aller à l'état 40
+
+    ADDSUB    [réduction par utilisation de la règle 11 (NombreSigne)]
+    DIV       [réduction par utilisation de la règle 11 (NombreSigne)]
+    STAR      [réduction par utilisation de la règle 11 (NombreSigne)]
+    MOD       [réduction par utilisation de la règle 11 (NombreSigne)]
+    $défaut  réduction par utilisation de la règle 11 (NombreSigne)
+
+
+état 50
+
+    9 NombreSigne: NombreSigne . ADDSUB NombreSigne
+   10            | NombreSigne . STAR NombreSigne
+   10            | NombreSigne STAR NombreSigne .
+   11            | NombreSigne . DIV NombreSigne
+   12            | NombreSigne . MOD NombreSigne
+
+    ADDSUB  décalage et aller à l'état 37
+    DIV     décalage et aller à l'état 38
+    STAR    décalage et aller à l'état 39
+    MOD     décalage et aller à l'état 40
+
+    ADDSUB    [réduction par utilisation de la règle 10 (NombreSigne)]
+    DIV       [réduction par utilisation de la règle 10 (NombreSigne)]
+    STAR      [réduction par utilisation de la règle 10 (NombreSigne)]
+    MOD       [réduction par utilisation de la règle 10 (NombreSigne)]
+    $défaut  réduction par utilisation de la règle 10 (NombreSigne)
+
+
+état 51
+
+    9 NombreSigne: NombreSigne . ADDSUB NombreSigne
+   10            | NombreSigne . STAR NombreSigne
+   11            | NombreSigne . DIV NombreSigne
+   12            | NombreSigne . MOD NombreSigne
+   12            | NombreSigne MOD NombreSigne .
+
+    ADDSUB  décalage et aller à l'état 37
+    DIV     décalage et aller à l'état 38
+    STAR    décalage et aller à l'état 39
+    MOD     décalage et aller à l'état 40
+
+    ADDSUB    [réduction par utilisation de la règle 12 (NombreSigne)]
+    DIV       [réduction par utilisation de la règle 12 (NombreSigne)]
+    STAR      [réduction par utilisation de la règle 12 (NombreSigne)]
+    MOD       [réduction par utilisation de la règle 12 (NombreSigne)]
+    $défaut  réduction par utilisation de la règle 12 (NombreSigne)
+
+
+état 52
+
+    5 ListConst: ListConst VRG IDENT EGAL NombreSigne .
+    9 NombreSigne: NombreSigne . ADDSUB NombreSigne
+   10            | NombreSigne . STAR NombreSigne
+   11            | NombreSigne . DIV NombreSigne
+   12            | NombreSigne . MOD NombreSigne
+
+    ADDSUB  décalage et aller à l'état 37
+    DIV     décalage et aller à l'état 38
+    STAR    décalage et aller à l'état 39
+    MOD     décalage et aller à l'état 40
+
+    $défaut  réduction par utilisation de la règle 5 (ListConst)
+
+
+état 53
+
+   16 ListVar: ListVar VRG Variable .
+
+    $défaut  réduction par utilisation de la règle 16 (ListVar)
+
+
+état 54
+
+   13 DeclVar: DeclVar . VAR FIXDeclVar ListVar PV
+   31 Corps: LACC DeclConst DeclVar . SuiteInstr RACC
+
+    IDENT   décalage et aller à l'état 58
+    STAR    décalage et aller à l'état 59
+    FREE    décalage et aller à l'état 60
+    PRINT   décalage et aller à l'état 61
+    READ    décalage et aller à l'état 62
+    PV      décalage et aller à l'état 63
+    RETURN  décalage et aller à l'état 64
+    IF      décalage et aller à l'état 65
+    WHILE   décalage et aller à l'état 66
+    LACC    décalage et aller à l'état 67
+    VAR     décalage et aller à l'état 9
+
+    $défaut  réduction par utilisation de la règle 33 (SuiteInstr)
+
+    SuiteInstr  aller à l'état 68
+    InstrComp   aller à l'état 69
+    Instr       aller à l'état 70
+
+
+état 55
+
+   28 Parametres: VOID .
+
+    $défaut  réduction par utilisation de la règle 28 (Parametres)
+
+
+état 56
+
+   16 ListVar: ListVar . VRG Variable
+   29 Parametres: ListVar .
+
+    VRG  décalage et aller à l'état 43
+
+    $défaut  réduction par utilisation de la règle 29 (Parametres)
+
+
+état 57
+
+   25 EnTeteFonct: Type IDENT LPAR Parametres . RPAR
+
+    RPAR  décalage et aller à l'état 71
+
+
+état 58
+
+   35 Instr: IDENT . EGAL Exp PV
+   37      | IDENT . EGAL MALLOC LPAR Exp RPAR PV
+   46      | IDENT . LPAR Arguments RPAR PV
+
+    EGAL  décalage et aller à l'état 72
+    LPAR  décalage et aller à l'état 73
+
+
+état 59
+
+   36 Instr: STAR . IDENT EGAL Exp PV
+
+    IDENT  décalage et aller à l'état 74
+
+
+état 60
+
+   38 Instr: FREE . LPAR Exp RPAR PV
+
+    LPAR  décalage et aller à l'état 75
+
+
+état 61
+
+   45 Instr: PRINT . LPAR Exp RPAR PV
+
+    LPAR  décalage et aller à l'état 76
+
+
+état 62
+
+   44 Instr: READ . LPAR IDENT RPAR PV
+
+    LPAR  décalage et aller à l'état 77
+
+
+état 63
+
+   47 Instr: PV .
+
+    $défaut  réduction par utilisation de la règle 47 (Instr)
+
+
+état 64
+
+   42 Instr: RETURN . Exp PV
+   43      | RETURN . PV
+
+    ADR     décalage et aller à l'état 78
+    ADDSUB  décalage et aller à l'état 79
+    NUM     décalage et aller à l'état 80
+    IDENT   décalage et aller à l'état 81
+    STAR    décalage et aller à l'état 28
+    PV      décalage et aller à l'état 82
+    LPAR    décalage et aller à l'état 83
+
+    Variable  aller à l'état 84
+    Exp       aller à l'état 85
+
+
+état 65
+
+   39 Instr: IF . LPAR Exp RPAR FIXIF Instr
+   40      | IF . LPAR Exp RPAR FIXIF Instr ELSE FIXELSE Instr
+
+    LPAR  décalage et aller à l'état 86
+
+
+état 66
+
+   41 Instr: WHILE . WHILESTART LPAR Exp RPAR WHILETEST Instr
+
+    $défaut  réduction par utilisation de la règle 66 (WHILESTART)
+
+    WHILESTART  aller à l'état 87
+
+
+état 67
+
+   34 InstrComp: LACC . SuiteInstr RACC
+
+    IDENT   décalage et aller à l'état 58
+    STAR    décalage et aller à l'état 59
+    FREE    décalage et aller à l'état 60
+    PRINT   décalage et aller à l'état 61
+    READ    décalage et aller à l'état 62
+    PV      décalage et aller à l'état 63
+    RETURN  décalage et aller à l'état 64
+    IF      décalage et aller à l'état 65
+    WHILE   décalage et aller à l'état 66
+    LACC    décalage et aller à l'état 67
+
+    $défaut  réduction par utilisation de la règle 33 (SuiteInstr)
+
+    SuiteInstr  aller à l'état 88
+    InstrComp   aller à l'état 69
+    Instr       aller à l'état 70
+
+
+état 68
+
+   31 Corps: LACC DeclConst DeclVar SuiteInstr . RACC
+
+    RACC  décalage et aller à l'état 89
+
+
+état 69
+
+   48 Instr: InstrComp .
+
+    $défaut  réduction par utilisation de la règle 48 (Instr)
+
+
+état 70
+
+   32 SuiteInstr: Instr . SuiteInstr
+
+    IDENT   décalage et aller à l'état 58
+    STAR    décalage et aller à l'état 59
+    FREE    décalage et aller à l'état 60
+    PRINT   décalage et aller à l'état 61
+    READ    décalage et aller à l'état 62
+    PV      décalage et aller à l'état 63
+    RETURN  décalage et aller à l'état 64
+    IF      décalage et aller à l'état 65
+    WHILE   décalage et aller à l'état 66
+    LACC    décalage et aller à l'état 67
+
+    $défaut  réduction par utilisation de la règle 33 (SuiteInstr)
+
+    SuiteInstr  aller à l'état 90
+    InstrComp   aller à l'état 69
+    Instr       aller à l'état 70
+
+
+état 71
+
+   25 EnTeteFonct: Type IDENT LPAR Parametres RPAR .
+
+    $défaut  réduction par utilisation de la règle 25 (EnTeteFonct)
+
+
+état 72
+
+   35 Instr: IDENT EGAL . Exp PV
+   37      | IDENT EGAL . MALLOC LPAR Exp RPAR PV
+
+    ADR     décalage et aller à l'état 78
+    ADDSUB  décalage et aller à l'état 79
+    NUM     décalage et aller à l'état 80
+    IDENT   décalage et aller à l'état 81
+    STAR    décalage et aller à l'état 28
+    MALLOC  décalage et aller à l'état 91
+    LPAR    décalage et aller à l'état 83
+
+    Variable  aller à l'état 84
+    Exp       aller à l'état 92
+
+
+état 73
+
+   46 Instr: IDENT LPAR . Arguments RPAR PV
+
+    ADR     décalage et aller à l'état 78
+    ADDSUB  décalage et aller à l'état 79
+    NUM     décalage et aller à l'état 80
+    IDENT   décalage et aller à l'état 81
+    STAR    décalage et aller à l'état 28
+    LPAR    décalage et aller à l'état 83
+
+    $défaut  réduction par utilisation de la règle 50 (Arguments)
+
+    Variable   aller à l'état 84
+    Arguments  aller à l'état 93
+    ListExp    aller à l'état 94
+    Exp        aller à l'état 95
+
+
+état 74
+
+   36 Instr: STAR IDENT . EGAL Exp PV
+
+    EGAL  décalage et aller à l'état 96
+
+
+état 75
+
+   38 Instr: FREE LPAR . Exp RPAR PV
+
+    ADR     décalage et aller à l'état 78
+    ADDSUB  décalage et aller à l'état 79
+    NUM     décalage et aller à l'état 80
+    IDENT   décalage et aller à l'état 81
+    STAR    décalage et aller à l'état 28
+    LPAR    décalage et aller à l'état 83
+
+    Variable  aller à l'état 84
+    Exp       aller à l'état 97
+
+
+état 76
+
+   45 Instr: PRINT LPAR . Exp RPAR PV
+
+    ADR     décalage et aller à l'état 78
+    ADDSUB  décalage et aller à l'état 79
+    NUM     décalage et aller à l'état 80
+    IDENT   décalage et aller à l'état 81
+    STAR    décalage et aller à l'état 28
+    LPAR    décalage et aller à l'état 83
+
+    Variable  aller à l'état 84
+    Exp       aller à l'état 98
+
+
+état 77
+
+   44 Instr: READ LPAR . IDENT RPAR PV
+
+    IDENT  décalage et aller à l'état 99
+
+
+état 78
+
+   61 Exp: ADR . Variable
+
+    IDENT  décalage et aller à l'état 27
+    STAR   décalage et aller à l'état 28
+
+    Variable  aller à l'état 100
+
+
+état 79
+
+   58 Exp: ADDSUB . Exp
+
+    ADR     décalage et aller à l'état 78
+    ADDSUB  décalage et aller à l'état 79
+    NUM     décalage et aller à l'état 80
+    IDENT   décalage et aller à l'état 81
+    STAR    décalage et aller à l'état 28
+    LPAR    décalage et aller à l'état 83
+
+    Variable  aller à l'état 84
+    Exp       aller à l'état 101
+
+
+état 80
+
+   62 Exp: NUM .
+
+    $défaut  réduction par utilisation de la règle 62 (Exp)
+
+
+état 81
+
+   19 Variable: IDENT .
+   63 Exp: IDENT . LPAR Arguments RPAR
+
+    LPAR  décalage et aller à l'état 102
+
+    $défaut  réduction par utilisation de la règle 19 (Variable)
+
+
+état 82
+
+   43 Instr: RETURN PV .
+
+    $défaut  réduction par utilisation de la règle 43 (Instr)
+
+
+état 83
+
+   59 Exp: LPAR . Exp RPAR
+
+    ADR     décalage et aller à l'état 78
+    ADDSUB  décalage et aller à l'état 79
+    NUM     décalage et aller à l'état 80
+    IDENT   décalage et aller à l'état 81
+    STAR    décalage et aller à l'état 28
+    LPAR    décalage et aller à l'état 83
+
+    Variable  aller à l'état 84
+    Exp       aller à l'état 103
+
+
+état 84
+
+   60 Exp: Variable .
+
+    $défaut  réduction par utilisation de la règle 60 (Exp)
+
+
+état 85
+
+   42 Instr: RETURN Exp . PV
+   53 Exp: Exp . ADDSUB Exp
+   54    | Exp . STAR Exp
+   55    | Exp . DIV Exp
+   56    | Exp . MOD Exp
+   57    | Exp . COMP Exp
+
+    COMP    décalage et aller à l'état 104
+    ADDSUB  décalage et aller à l'état 105
+    DIV     décalage et aller à l'état 106
+    STAR    décalage et aller à l'état 107
+    MOD     décalage et aller à l'état 108
+    PV      décalage et aller à l'état 109
+
+
+état 86
+
+   39 Instr: IF LPAR . Exp RPAR FIXIF Instr
+   40      | IF LPAR . Exp RPAR FIXIF Instr ELSE FIXELSE Instr
+
+    ADR     décalage et aller à l'état 78
+    ADDSUB  décalage et aller à l'état 79
+    NUM     décalage et aller à l'état 80
+    IDENT   décalage et aller à l'état 81
+    STAR    décalage et aller à l'état 28
+    LPAR    décalage et aller à l'état 83
+
+    Variable  aller à l'état 84
+    Exp       aller à l'état 110
+
+
+état 87
+
+   41 Instr: WHILE WHILESTART . LPAR Exp RPAR WHILETEST Instr
+
+    LPAR  décalage et aller à l'état 111
+
+
+état 88
+
+   34 InstrComp: LACC SuiteInstr . RACC
+
+    RACC  décalage et aller à l'état 112
+
+
+état 89
+
+   31 Corps: LACC DeclConst DeclVar SuiteInstr RACC .
+
+    $défaut  réduction par utilisation de la règle 31 (Corps)
+
+
+état 90
+
+   32 SuiteInstr: Instr SuiteInstr .
+
+    $défaut  réduction par utilisation de la règle 32 (SuiteInstr)
+
+
+état 91
+
+   37 Instr: IDENT EGAL MALLOC . LPAR Exp RPAR PV
+
+    LPAR  décalage et aller à l'état 113
+
+
+état 92
+
+   35 Instr: IDENT EGAL Exp . PV
+   53 Exp: Exp . ADDSUB Exp
+   54    | Exp . STAR Exp
+   55    | Exp . DIV Exp
+   56    | Exp . MOD Exp
+   57    | Exp . COMP Exp
+
+    COMP    décalage et aller à l'état 104
+    ADDSUB  décalage et aller à l'état 105
+    DIV     décalage et aller à l'état 106
+    STAR    décalage et aller à l'état 107
+    MOD     décalage et aller à l'état 108
+    PV      décalage et aller à l'état 114
+
+
+état 93
+
+   46 Instr: IDENT LPAR Arguments . RPAR PV
+
+    RPAR  décalage et aller à l'état 115
+
+
+état 94
+
+   49 Arguments: ListExp .
+   51 ListExp: ListExp . VRG Exp
+
+    VRG  décalage et aller à l'état 116
+
+    $défaut  réduction par utilisation de la règle 49 (Arguments)
+
+
+état 95
+
+   52 ListExp: Exp .
+   53 Exp: Exp . ADDSUB Exp
+   54    | Exp . STAR Exp
+   55    | Exp . DIV Exp
+   56    | Exp . MOD Exp
+   57    | Exp . COMP Exp
+
+    COMP    décalage et aller à l'état 104
+    ADDSUB  décalage et aller à l'état 105
+    DIV     décalage et aller à l'état 106
+    STAR    décalage et aller à l'état 107
+    MOD     décalage et aller à l'état 108
+
+    $défaut  réduction par utilisation de la règle 52 (ListExp)
+
+
+état 96
+
+   36 Instr: STAR IDENT EGAL . Exp PV
+
+    ADR     décalage et aller à l'état 78
+    ADDSUB  décalage et aller à l'état 79
+    NUM     décalage et aller à l'état 80
+    IDENT   décalage et aller à l'état 81
+    STAR    décalage et aller à l'état 28
+    LPAR    décalage et aller à l'état 83
+
+    Variable  aller à l'état 84
+    Exp       aller à l'état 117
+
+
+état 97
+
+   38 Instr: FREE LPAR Exp . RPAR PV
+   53 Exp: Exp . ADDSUB Exp
+   54    | Exp . STAR Exp
+   55    | Exp . DIV Exp
+   56    | Exp . MOD Exp
+   57    | Exp . COMP Exp
+
+    COMP    décalage et aller à l'état 104
+    ADDSUB  décalage et aller à l'état 105
+    DIV     décalage et aller à l'état 106
+    STAR    décalage et aller à l'état 107
+    MOD     décalage et aller à l'état 108
+    RPAR    décalage et aller à l'état 118
+
+
+état 98
+
+   45 Instr: PRINT LPAR Exp . RPAR PV
+   53 Exp: Exp . ADDSUB Exp
+   54    | Exp . STAR Exp
+   55    | Exp . DIV Exp
+   56    | Exp . MOD Exp
+   57    | Exp . COMP Exp
+
+    COMP    décalage et aller à l'état 104
+    ADDSUB  décalage et aller à l'état 105
+    DIV     décalage et aller à l'état 106
+    STAR    décalage et aller à l'état 107
+    MOD     décalage et aller à l'état 108
+    RPAR    décalage et aller à l'état 119
+
+
+état 99
+
+   44 Instr: READ LPAR IDENT . RPAR PV
+
+    RPAR  décalage et aller à l'état 120
+
+
+état 100
+
+   61 Exp: ADR Variable .
+
+    $défaut  réduction par utilisation de la règle 61 (Exp)
+
+
+état 101
+
+   53 Exp: Exp . ADDSUB Exp
+   54    | Exp . STAR Exp
+   55    | Exp . DIV Exp
+   56    | Exp . MOD Exp
+   57    | Exp . COMP Exp
+   58    | ADDSUB Exp .
+
+    COMP    décalage et aller à l'état 104
+    ADDSUB  décalage et aller à l'état 105
+    DIV     décalage et aller à l'état 106
+    STAR    décalage et aller à l'état 107
+    MOD     décalage et aller à l'état 108
+
+    COMP      [réduction par utilisation de la règle 58 (Exp)]
+    ADDSUB    [réduction par utilisation de la règle 58 (Exp)]
+    DIV       [réduction par utilisation de la règle 58 (Exp)]
+    STAR      [réduction par utilisation de la règle 58 (Exp)]
+    MOD       [réduction par utilisation de la règle 58 (Exp)]
+    $défaut  réduction par utilisation de la règle 58 (Exp)
+
+
+état 102
+
+   63 Exp: IDENT LPAR . Arguments RPAR
+
+    ADR     décalage et aller à l'état 78
+    ADDSUB  décalage et aller à l'état 79
+    NUM     décalage et aller à l'état 80
+    IDENT   décalage et aller à l'état 81
+    STAR    décalage et aller à l'état 28
+    LPAR    décalage et aller à l'état 83
+
+    $défaut  réduction par utilisation de la règle 50 (Arguments)
+
+    Variable   aller à l'état 84
+    Arguments  aller à l'état 121
+    ListExp    aller à l'état 94
+    Exp        aller à l'état 95
+
+
+état 103
+
+   53 Exp: Exp . ADDSUB Exp
+   54    | Exp . STAR Exp
+   55    | Exp . DIV Exp
+   56    | Exp . MOD Exp
+   57    | Exp . COMP Exp
+   59    | LPAR Exp . RPAR
+
+    COMP    décalage et aller à l'état 104
+    ADDSUB  décalage et aller à l'état 105
+    DIV     décalage et aller à l'état 106
+    STAR    décalage et aller à l'état 107
+    MOD     décalage et aller à l'état 108
+    RPAR    décalage et aller à l'état 122
+
+
+état 104
+
+   57 Exp: Exp COMP . Exp
+
+    ADR     décalage et aller à l'état 78
+    ADDSUB  décalage et aller à l'état 79
+    NUM     décalage et aller à l'état 80
+    IDENT   décalage et aller à l'état 81
+    STAR    décalage et aller à l'état 28
+    LPAR    décalage et aller à l'état 83
+
+    Variable  aller à l'état 84
+    Exp       aller à l'état 123
+
+
+état 105
+
+   53 Exp: Exp ADDSUB . Exp
+
+    ADR     décalage et aller à l'état 78
+    ADDSUB  décalage et aller à l'état 79
+    NUM     décalage et aller à l'état 80
+    IDENT   décalage et aller à l'état 81
+    STAR    décalage et aller à l'état 28
+    LPAR    décalage et aller à l'état 83
+
+    Variable  aller à l'état 84
+    Exp       aller à l'état 124
+
+
+état 106
+
+   55 Exp: Exp DIV . Exp
+
+    ADR     décalage et aller à l'état 78
+    ADDSUB  décalage et aller à l'état 79
+    NUM     décalage et aller à l'état 80
+    IDENT   décalage et aller à l'état 81
+    STAR    décalage et aller à l'état 28
+    LPAR    décalage et aller à l'état 83
+
+    Variable  aller à l'état 84
+    Exp       aller à l'état 125
+
+
+état 107
+
+   54 Exp: Exp STAR . Exp
+
+    ADR     décalage et aller à l'état 78
+    ADDSUB  décalage et aller à l'état 79
+    NUM     décalage et aller à l'état 80
+    IDENT   décalage et aller à l'état 81
+    STAR    décalage et aller à l'état 28
+    LPAR    décalage et aller à l'état 83
+
+    Variable  aller à l'état 84
+    Exp       aller à l'état 126
+
+
+état 108
+
+   56 Exp: Exp MOD . Exp
+
+    ADR     décalage et aller à l'état 78
+    ADDSUB  décalage et aller à l'état 79
+    NUM     décalage et aller à l'état 80
+    IDENT   décalage et aller à l'état 81
+    STAR    décalage et aller à l'état 28
+    LPAR    décalage et aller à l'état 83
+
+    Variable  aller à l'état 84
+    Exp       aller à l'état 127
+
+
+état 109
+
+   42 Instr: RETURN Exp PV .
+
+    $défaut  réduction par utilisation de la règle 42 (Instr)
+
+
+état 110
+
+   39 Instr: IF LPAR Exp . RPAR FIXIF Instr
+   40      | IF LPAR Exp . RPAR FIXIF Instr ELSE FIXELSE Instr
+   53 Exp: Exp . ADDSUB Exp
+   54    | Exp . STAR Exp
+   55    | Exp . DIV Exp
+   56    | Exp . MOD Exp
+   57    | Exp . COMP Exp
+
+    COMP    décalage et aller à l'état 104
+    ADDSUB  décalage et aller à l'état 105
+    DIV     décalage et aller à l'état 106
+    STAR    décalage et aller à l'état 107
+    MOD     décalage et aller à l'état 108
+    RPAR    décalage et aller à l'état 128
+
+
+état 111
+
+   41 Instr: WHILE WHILESTART LPAR . Exp RPAR WHILETEST Instr
+
+    ADR     décalage et aller à l'état 78
+    ADDSUB  décalage et aller à l'état 79
+    NUM     décalage et aller à l'état 80
+    IDENT   décalage et aller à l'état 81
+    STAR    décalage et aller à l'état 28
+    LPAR    décalage et aller à l'état 83
+
+    Variable  aller à l'état 84
+    Exp       aller à l'état 129
+
+
+état 112
+
+   34 InstrComp: LACC SuiteInstr RACC .
+
+    $défaut  réduction par utilisation de la règle 34 (InstrComp)
+
+
+état 113
+
+   37 Instr: IDENT EGAL MALLOC LPAR . Exp RPAR PV
+
+    ADR     décalage et aller à l'état 78
+    ADDSUB  décalage et aller à l'état 79
+    NUM     décalage et aller à l'état 80
+    IDENT   décalage et aller à l'état 81
+    STAR    décalage et aller à l'état 28
+    LPAR    décalage et aller à l'état 83
+
+    Variable  aller à l'état 84
+    Exp       aller à l'état 130
+
+
+état 114
+
+   35 Instr: IDENT EGAL Exp PV .
+
+    $défaut  réduction par utilisation de la règle 35 (Instr)
+
+
+état 115
+
+   46 Instr: IDENT LPAR Arguments RPAR . PV
+
+    PV  décalage et aller à l'état 131
+
+
+état 116
+
+   51 ListExp: ListExp VRG . Exp
+
+    ADR     décalage et aller à l'état 78
+    ADDSUB  décalage et aller à l'état 79
+    NUM     décalage et aller à l'état 80
+    IDENT   décalage et aller à l'état 81
+    STAR    décalage et aller à l'état 28
+    LPAR    décalage et aller à l'état 83
+
+    Variable  aller à l'état 84
+    Exp       aller à l'état 132
+
+
+état 117
+
+   36 Instr: STAR IDENT EGAL Exp . PV
+   53 Exp: Exp . ADDSUB Exp
+   54    | Exp . STAR Exp
+   55    | Exp . DIV Exp
+   56    | Exp . MOD Exp
+   57    | Exp . COMP Exp
+
+    COMP    décalage et aller à l'état 104
+    ADDSUB  décalage et aller à l'état 105
+    DIV     décalage et aller à l'état 106
+    STAR    décalage et aller à l'état 107
+    MOD     décalage et aller à l'état 108
+    PV      décalage et aller à l'état 133
+
+
+état 118
+
+   38 Instr: FREE LPAR Exp RPAR . PV
+
+    PV  décalage et aller à l'état 134
+
+
+état 119
+
+   45 Instr: PRINT LPAR Exp RPAR . PV
+
+    PV  décalage et aller à l'état 135
+
+
+état 120
+
+   44 Instr: READ LPAR IDENT RPAR . PV
+
+    PV  décalage et aller à l'état 136
+
+
+état 121
+
+   63 Exp: IDENT LPAR Arguments . RPAR
+
+    RPAR  décalage et aller à l'état 137
+
+
+état 122
+
+   59 Exp: LPAR Exp RPAR .
+
+    $défaut  réduction par utilisation de la règle 59 (Exp)
+
+
+état 123
+
+   53 Exp: Exp . ADDSUB Exp
+   54    | Exp . STAR Exp
+   55    | Exp . DIV Exp
+   56    | Exp . MOD Exp
+   57    | Exp . COMP Exp
+   57    | Exp COMP Exp .
+
+    COMP    décalage et aller à l'état 104
+    ADDSUB  décalage et aller à l'état 105
+    DIV     décalage et aller à l'état 106
+    STAR    décalage et aller à l'état 107
+    MOD     décalage et aller à l'état 108
+
+    COMP      [réduction par utilisation de la règle 57 (Exp)]
+    ADDSUB    [réduction par utilisation de la règle 57 (Exp)]
+    DIV       [réduction par utilisation de la règle 57 (Exp)]
+    STAR      [réduction par utilisation de la règle 57 (Exp)]
+    MOD       [réduction par utilisation de la règle 57 (Exp)]
+    $défaut  réduction par utilisation de la règle 57 (Exp)
+
+
+état 124
+
+   53 Exp: Exp . ADDSUB Exp
+   53    | Exp ADDSUB Exp .
+   54    | Exp . STAR Exp
+   55    | Exp . DIV Exp
+   56    | Exp . MOD Exp
+   57    | Exp . COMP Exp
+
+    COMP    décalage et aller à l'état 104
+    ADDSUB  décalage et aller à l'état 105
+    DIV     décalage et aller à l'état 106
+    STAR    décalage et aller à l'état 107
+    MOD     décalage et aller à l'état 108
+
+    COMP      [réduction par utilisation de la règle 53 (Exp)]
+    ADDSUB    [réduction par utilisation de la règle 53 (Exp)]
+    DIV       [réduction par utilisation de la règle 53 (Exp)]
+    STAR      [réduction par utilisation de la règle 53 (Exp)]
+    MOD       [réduction par utilisation de la règle 53 (Exp)]
+    $défaut  réduction par utilisation de la règle 53 (Exp)
+
+
+état 125
+
+   53 Exp: Exp . ADDSUB Exp
+   54    | Exp . STAR Exp
+   55    | Exp . DIV Exp
+   55    | Exp DIV Exp .
+   56    | Exp . MOD Exp
+   57    | Exp . COMP Exp
+
+    COMP    décalage et aller à l'état 104
+    ADDSUB  décalage et aller à l'état 105
+    DIV     décalage et aller à l'état 106
+    STAR    décalage et aller à l'état 107
+    MOD     décalage et aller à l'état 108
+
+    COMP      [réduction par utilisation de la règle 55 (Exp)]
+    ADDSUB    [réduction par utilisation de la règle 55 (Exp)]
+    DIV       [réduction par utilisation de la règle 55 (Exp)]
+    STAR      [réduction par utilisation de la règle 55 (Exp)]
+    MOD       [réduction par utilisation de la règle 55 (Exp)]
+    $défaut  réduction par utilisation de la règle 55 (Exp)
+
+
+état 126
+
+   53 Exp: Exp . ADDSUB Exp
+   54    | Exp . STAR Exp
+   54    | Exp STAR Exp .
+   55    | Exp . DIV Exp
+   56    | Exp . MOD Exp
+   57    | Exp . COMP Exp
+
+    COMP    décalage et aller à l'état 104
+    ADDSUB  décalage et aller à l'état 105
+    DIV     décalage et aller à l'état 106
+    STAR    décalage et aller à l'état 107
+    MOD     décalage et aller à l'état 108
+
+    COMP      [réduction par utilisation de la règle 54 (Exp)]
+    ADDSUB    [réduction par utilisation de la règle 54 (Exp)]
+    DIV       [réduction par utilisation de la règle 54 (Exp)]
+    STAR      [réduction par utilisation de la règle 54 (Exp)]
+    MOD       [réduction par utilisation de la règle 54 (Exp)]
+    $défaut  réduction par utilisation de la règle 54 (Exp)
+
+
+état 127
+
+   53 Exp: Exp . ADDSUB Exp
+   54    | Exp . STAR Exp
+   55    | Exp . DIV Exp
+   56    | Exp . MOD Exp
+   56    | Exp MOD Exp .
+   57    | Exp . COMP Exp
+
+    COMP    décalage et aller à l'état 104
+    ADDSUB  décalage et aller à l'état 105
+    DIV     décalage et aller à l'état 106
+    STAR    décalage et aller à l'état 107
+    MOD     décalage et aller à l'état 108
+
+    COMP      [réduction par utilisation de la règle 56 (Exp)]
+    ADDSUB    [réduction par utilisation de la règle 56 (Exp)]
+    DIV       [réduction par utilisation de la règle 56 (Exp)]
+    STAR      [réduction par utilisation de la règle 56 (Exp)]
+    MOD       [réduction par utilisation de la règle 56 (Exp)]
+    $défaut  réduction par utilisation de la règle 56 (Exp)
+
+
+état 128
+
+   39 Instr: IF LPAR Exp RPAR . FIXIF Instr
+   40      | IF LPAR Exp RPAR . FIXIF Instr ELSE FIXELSE Instr
+
+    $défaut  réduction par utilisation de la règle 64 (FIXIF)
+
+    FIXIF  aller à l'état 138
+
+
+état 129
+
+   41 Instr: WHILE WHILESTART LPAR Exp . RPAR WHILETEST Instr
+   53 Exp: Exp . ADDSUB Exp
+   54    | Exp . STAR Exp
+   55    | Exp . DIV Exp
+   56    | Exp . MOD Exp
+   57    | Exp . COMP Exp
+
+    COMP    décalage et aller à l'état 104
+    ADDSUB  décalage et aller à l'état 105
+    DIV     décalage et aller à l'état 106
+    STAR    décalage et aller à l'état 107
+    MOD     décalage et aller à l'état 108
+    RPAR    décalage et aller à l'état 139
+
+
+état 130
+
+   37 Instr: IDENT EGAL MALLOC LPAR Exp . RPAR PV
+   53 Exp: Exp . ADDSUB Exp
+   54    | Exp . STAR Exp
+   55    | Exp . DIV Exp
+   56    | Exp . MOD Exp
+   57    | Exp . COMP Exp
+
+    COMP    décalage et aller à l'état 104
+    ADDSUB  décalage et aller à l'état 105
+    DIV     décalage et aller à l'état 106
+    STAR    décalage et aller à l'état 107
+    MOD     décalage et aller à l'état 108
+    RPAR    décalage et aller à l'état 140
+
+
+état 131
+
+   46 Instr: IDENT LPAR Arguments RPAR PV .
+
+    $défaut  réduction par utilisation de la règle 46 (Instr)
+
+
+état 132
+
+   51 ListExp: ListExp VRG Exp .
+   53 Exp: Exp . ADDSUB Exp
+   54    | Exp . STAR Exp
+   55    | Exp . DIV Exp
+   56    | Exp . MOD Exp
+   57    | Exp . COMP Exp
+
+    COMP    décalage et aller à l'état 104
+    ADDSUB  décalage et aller à l'état 105
+    DIV     décalage et aller à l'état 106
+    STAR    décalage et aller à l'état 107
+    MOD     décalage et aller à l'état 108
+
+    $défaut  réduction par utilisation de la règle 51 (ListExp)
+
+
+état 133
+
+   36 Instr: STAR IDENT EGAL Exp PV .
+
+    $défaut  réduction par utilisation de la règle 36 (Instr)
+
+
+état 134
+
+   38 Instr: FREE LPAR Exp RPAR PV .
+
+    $défaut  réduction par utilisation de la règle 38 (Instr)
+
+
+état 135
+
+   45 Instr: PRINT LPAR Exp RPAR PV .
+
+    $défaut  réduction par utilisation de la règle 45 (Instr)
+
+
+état 136
+
+   44 Instr: READ LPAR IDENT RPAR PV .
+
+    $défaut  réduction par utilisation de la règle 44 (Instr)
+
+
+état 137
+
+   63 Exp: IDENT LPAR Arguments RPAR .
+
+    $défaut  réduction par utilisation de la règle 63 (Exp)
+
+
+état 138
+
+   39 Instr: IF LPAR Exp RPAR FIXIF . Instr
+   40      | IF LPAR Exp RPAR FIXIF . Instr ELSE FIXELSE Instr
+
+    IDENT   décalage et aller à l'état 58
+    STAR    décalage et aller à l'état 59
+    FREE    décalage et aller à l'état 60
+    PRINT   décalage et aller à l'état 61
+    READ    décalage et aller à l'état 62
+    PV      décalage et aller à l'état 63
+    RETURN  décalage et aller à l'état 64
+    IF      décalage et aller à l'état 65
+    WHILE   décalage et aller à l'état 66
+    LACC    décalage et aller à l'état 67
+
+    InstrComp  aller à l'état 69
+    Instr      aller à l'état 141
+
+
+état 139
+
+   41 Instr: WHILE WHILESTART LPAR Exp RPAR . WHILETEST Instr
+
+    $défaut  réduction par utilisation de la règle 67 (WHILETEST)
+
+    WHILETEST  aller à l'état 142
+
+
+état 140
+
+   37 Instr: IDENT EGAL MALLOC LPAR Exp RPAR . PV
+
+    PV  décalage et aller à l'état 143
+
+
+état 141
+
+   39 Instr: IF LPAR Exp RPAR FIXIF Instr .
+   40      | IF LPAR Exp RPAR FIXIF Instr . ELSE FIXELSE Instr
+
+    ELSE  décalage et aller à l'état 144
+
+    ELSE      [réduction par utilisation de la règle 39 (Instr)]
+    $défaut  réduction par utilisation de la règle 39 (Instr)
+
+
+état 142
+
+   41 Instr: WHILE WHILESTART LPAR Exp RPAR WHILETEST . Instr
+
+    IDENT   décalage et aller à l'état 58
+    STAR    décalage et aller à l'état 59
+    FREE    décalage et aller à l'état 60
+    PRINT   décalage et aller à l'état 61
+    READ    décalage et aller à l'état 62
+    PV      décalage et aller à l'état 63
+    RETURN  décalage et aller à l'état 64
+    IF      décalage et aller à l'état 65
+    WHILE   décalage et aller à l'état 66
+    LACC    décalage et aller à l'état 67
+
+    InstrComp  aller à l'état 69
+    Instr      aller à l'état 145
+
+
+état 143
+
+   37 Instr: IDENT EGAL MALLOC LPAR Exp RPAR PV .
+
+    $défaut  réduction par utilisation de la règle 37 (Instr)
+
+
+état 144
+
+   40 Instr: IF LPAR Exp RPAR FIXIF Instr ELSE . FIXELSE Instr
+
+    $défaut  réduction par utilisation de la règle 65 (FIXELSE)
+
+    FIXELSE  aller à l'état 146
+
+
+état 145
+
+   41 Instr: WHILE WHILESTART LPAR Exp RPAR WHILETEST Instr .
+
+    $défaut  réduction par utilisation de la règle 41 (Instr)
+
+
+état 146
+
+   40 Instr: IF LPAR Exp RPAR FIXIF Instr ELSE FIXELSE . Instr
+
+    IDENT   décalage et aller à l'état 58
+    STAR    décalage et aller à l'état 59
+    FREE    décalage et aller à l'état 60
+    PRINT   décalage et aller à l'état 61
+    READ    décalage et aller à l'état 62
+    PV      décalage et aller à l'état 63
+    RETURN  décalage et aller à l'état 64
+    IF      décalage et aller à l'état 65
+    WHILE   décalage et aller à l'état 66
+    LACC    décalage et aller à l'état 67
+
+    InstrComp  aller à l'état 69
+    Instr      aller à l'état 147
+
+
+état 147
+
+   40 Instr: IF LPAR Exp RPAR FIXIF Instr ELSE FIXELSE Instr .
+
+    $défaut  réduction par utilisation de la règle 40 (Instr)
