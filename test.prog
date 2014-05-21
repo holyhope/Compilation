@@ -4,6 +4,7 @@ main () {
   b = 10;
   a = &b;
   print( a );
+  test( b ) ;
   print( *a );
   print( b );
 }
