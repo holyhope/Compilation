@@ -15,18 +15,18 @@ Terminals unused in grammar
    RSQB
 
 
-État 36conflits: 4 décalage/réduction
-État 48conflits: 4 décalage/réduction
-État 49conflits: 4 décalage/réduction
-État 50conflits: 4 décalage/réduction
-État 51conflits: 4 décalage/réduction
-État 101conflits: 5 décalage/réduction
-État 123conflits: 5 décalage/réduction
-État 124conflits: 5 décalage/réduction
-État 125conflits: 5 décalage/réduction
-État 126conflits: 5 décalage/réduction
-État 127conflits: 5 décalage/réduction
-État 141conflits: 1 décalage/réduction
+État 36 conflits: 4 décalage/réduction
+État 48 conflits: 4 décalage/réduction
+État 49 conflits: 4 décalage/réduction
+État 50 conflits: 4 décalage/réduction
+État 51 conflits: 4 décalage/réduction
+État 101 conflits: 5 décalage/réduction
+État 123 conflits: 5 décalage/réduction
+État 124 conflits: 5 décalage/réduction
+État 125 conflits: 5 décalage/réduction
+État 126 conflits: 5 décalage/réduction
+État 127 conflits: 5 décalage/réduction
+État 141 conflits: 1 décalage/réduction
 
 
 Grammaire

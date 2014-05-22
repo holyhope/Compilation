@@ -1,11 +1,5 @@
-void test (b){
-int b;
-b = b+1;
-}
-
 main () {
   var a, b;
   b = 10;
   print( b );
-  test ( b );
 }

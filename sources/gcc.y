@@ -571,6 +571,8 @@ int main( int argc, const char *argv[] ) {
   int size = 0, i;  
   char* argument = NULL;
   int out;
+  int j = 0;
+  char fin_ext[5];
 
   if ( 2 == argc || 3 == argc ) {
     size = strlen ( argv[1] );
@@ -580,9 +582,11 @@ int main( int argc, const char *argv[] ) {
       argument [i] = argv[1][i];
     }
     for (; i <= size ; i++ ) {
-      extension [i-4] = argv[1][i];
+      extension[i-4] = argv[1][i];
+      fin_ext[j] = extension[i-4];
+      j++;
     }
-    if ( strcmp ( extension, ".tpc" ) != 0 ) {
+    if ( strcmp ( fin_ext, ".tpc" ) != 0 ) {
       fprintf ( stderr, "Erreur extension, le fichier doit être du type .tpc\n" );
       return 1;
     }
