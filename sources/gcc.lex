@@ -1,8 +1,10 @@
 %{
-  #include "sources/gcc.h"
+  #include "gcc.h"
   #include <stdio.h>
   #include <stdlib.h>
   #include <string.h>
+  
+  int fileno(FILE *stream);
 %}
 
 %option noyywrap

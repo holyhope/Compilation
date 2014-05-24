@@ -1,28 +1,27 @@
 CC=gcc
-CFLAGS=-Wall `pkg-config --cflags glib-2.0` -g
+CFLAGS=-Wall -pedantic -ansi `pkg-config --cflags glib-2.0` -g
 LDFLAGS=`pkg-config --libs glib-2.0` #-lfl
 OUT_EXEC=tcompil
 EXEC=gcc
-SRC = sources/
+SRC = sources
+TMP = tmp
 
-all: $(OUT_EXEC) clean
+all: $(TMP)/$(EXEC).o $(TMP)/lex.yy.o $(TMP)/vm_instr.o
+	$(CC) -o $(OUT_EXEC) $^ $(LDFLAGS)
 
-$(OUT_EXEC): $(SRC)$(EXEC).o lex.yy.o $(SRC)vm_instr.o
-	$(CC)  -o $@ $^ $(LDFLAGS)
+$(SRC)/$(EXEC).c: $(SRC)/$(EXEC).y $(SRC)/$(EXEC).h
+	bison -d -o $@ $< -v
 
-$(SRC)$(EXEC).c: $(SRC)$(EXEC).y
-	bison -d -o $(SRC)$(EXEC).c $(SRC)$(EXEC).y -v
+$(SRC)/lex.yy.c: $(SRC)/$(EXEC).lex
+	flex -o $@ --header-file=$(SRC)/$(EXEC).h $<
 
-$(SRC)$(EXEC).h: $(SRC)$(EXEC).c
+$(SRC)/$(EXEC).h: $(SRC)/lex.yy.c
 
-lex.yy.c: $(SRC)$(EXEC).lex $(SRC)$(EXEC).h
-	flex $(SRC)$(EXEC).lex
-
-$(SRC)%.o: $(SRC)%.c
+$(TMP)/%.o: $(SRC)/%.c
 	$(CC) -o $@ -c $< $(CFLAGS)
 
 clean:
-	rm -f *.o lex.yy.c $(SRC)$(EXEC).[ch]
+	rm -f $(TMP)/* $(SRC)/lex.yy.c $(SRC)/$(EXEC).[hc]
 
 mrproper: clean
 	rm -f $(EXEC)

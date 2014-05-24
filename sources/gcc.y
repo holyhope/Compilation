@@ -142,7 +142,16 @@ FIXDeclVar:                                              { mode_declaratif = 1; 
 ListVar: ListVar VRG Variable                            {}
   | Variable                                             {}
   ;
-Variable: STAR Variable                                     { $$ = $2; }
+Variable: STAR Variable                                     {
+    if ( mode_declaratif ) {
+      ( (VariableData*) $2 )->type = pointeur;
+    } else {
+      vm_exec( vm_pop );
+      vm_exec( vm_load );
+      vm_exec( vm_push );
+    }
+    $$ = $2;
+  }
   | IDENT                                                {
     VariableData *var;
     if ( mode_declaratif ) {
@@ -214,7 +223,7 @@ Instr: IDENT EGAL Exp PV                                 {
   | IF LPAR Exp RPAR FIXIF Instr %prec ENDIF             {
     vm_exec( vm_label, $5 );
   }
-  | IF LPAR Exp RPAR FIXIF Instr  ELSE FIXELSE Instr     {
+  | IF LPAR Exp RPAR FIXIF Instr ELSE FIXELSE Instr     {
     vm_exec( vm_label, $8 );
   }
   | WHILE WHILESTART LPAR Exp RPAR WHILETEST Instr       {
@@ -318,7 +327,12 @@ Exp: Exp ADDSUB Exp                                      {
     vm_exec( vm_push );
     $$ = get_addr( $1 );
   }
-  | ADR Variable                                         {}
+  | ADR Variable                                         {
+    vm_exec( vm_pop );
+    vm_exec( vm_set, get_addr( $2 ) ); 
+    vm_exec( vm_push );
+    $$ = get_addr( $2 );
+  }
   | NUM                                                  {
     vm_exec( vm_set, $$ = $1 );
     vm_exec( vm_push );

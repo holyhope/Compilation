@@ -1,5 +1,8 @@
 main () {
-  var a, b;
+  var a, b, *c;
   b = 10;
-  print( b );
+  c = &b;
+  c = 1;
+  *c = 2;
+  print( **c );
 }
