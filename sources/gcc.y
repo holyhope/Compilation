@@ -610,7 +610,8 @@ int main( int argc, const char *argv[] ) {
     }
     if ( argc == 3 && strcmp( argv[2], "-o") == 0 ){
       strcat ( argument, ".vm" );
-      if ( -1 == ( out = open ( argument, O_TRUNC | O_WRONLY ) ) ) {
+      
+      if ( -1 == ( out = open ( argument, O_CREAT | O_RDWR ) ) ) {
         perror ( "open" );
         exit( EXIT_FAILURE );
       } else if ( -1 == dup2( STDOUT_FILENO, out ) ) {

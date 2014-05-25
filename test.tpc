@@ -1,8 +1,11 @@
 main () {
   var a, b, *c;
   b = 10;
-  c = &b;
-  c = 1;
-  *c = 2;
-  print( **c );
+  a = 3;
+  *c = a;
+  print(*c);
+  if (a < b) {
+    print(a);
+  }
+  print( b );
 }
